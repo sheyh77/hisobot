@@ -1,0 +1,12 @@
+@import "./global/_native.scss";
+@import "./layout/_main.scss";
+
+// layout
+@import "./layout/_main.scss";
+@import "./layout/_header.scss";
+@import "./layout/_footer.scss";
+
+// components
+@import "./components/_dashboard.scss";
+@import "./components/_output.scss";
+@import "./components/_reports.scss";
