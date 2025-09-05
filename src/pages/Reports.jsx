@@ -120,8 +120,7 @@ const Reports = () => {
         )} ${new Date(r.createdAt).toLocaleTimeString("uz-UZ", {
           hour: "2-digit",
           minute: "2-digit",
-        })} | ${r.type.toUpperCase()} | ${r.amount} so'm | ${
-          r.desc || "-"
+        })} | ${r.type.toUpperCase()} | ${r.amount} so'm | ${r.desc || "-"
         }`,
         10,
         20 + i * 10
@@ -134,63 +133,46 @@ const Reports = () => {
   return (
     <section className="hisobot">
       <div className="cantainer">
-        <h2>📊 Hisobot</h2>
+        <div className="hisobot-wrap">
+          <h2>📊 Hisobot</h2>
 
-        <div style={{ marginBottom: 15 }}>
-          <Button
-            type={filter === "all" ? "primary" : "default"}
-            onClick={() => setFilter("all")}
-          >
-            Hammasi
-          </Button>
-          <Button
-            type={filter === "kirim" ? "primary" : "default"}
-            onClick={() => setFilter("kirim")}
-            style={{ marginLeft: 10 }}
-          >
-            Faqat kirim
-          </Button>
-          <Button
-            type={filter === "chiqim" ? "primary" : "default"}
-            onClick={() => setFilter("chiqim")}
-            style={{ marginLeft: 10 }}
-          >
-            Faqat chiqim
-          </Button>
-        </div>
+          <div style={{ marginBottom: 15 }}>
+            <Button
+              type={filter === "all" ? "primary" : "default"}
+              onClick={() => setFilter("all")}
+            >
+              Hammasi
+            </Button>
+            <Button
+              type={filter === "kirim" ? "primary" : "default"}
+              onClick={() => setFilter("kirim")}
+              style={{ marginLeft: 10 }}
+            >
+              Faqat kirim
+            </Button>
+            <Button
+              type={filter === "chiqim" ? "primary" : "default"}
+              onClick={() => setFilter("chiqim")}
+              style={{ marginLeft: 10 }}
+            >
+              Faqat chiqim
+            </Button>
+          </div>
 
-        <div style={{ marginBottom: 15 }}>
-          <Button onClick={exportCSV} style={{ marginRight: 10 }}>
-            📥 CSV yuklab olish
-          </Button>
-          <Button onClick={exportPDF}>📄 PDF yuklab olish</Button>
-        </div>
+          <div style={{ marginBottom: 15 }}>
+            <Button onClick={exportCSV} style={{ marginRight: 10 }}>
+              📥 CSV yuklab olish
+            </Button>
+            <Button onClick={exportPDF}>📄 PDF yuklab olish</Button>
+          </div>
 
-        <Table
-          columns={columns}
-          dataSource={filtered}
-          pagination={{ pageSize: 7 }}
-        />
-
-        <div style={{ width: "100%", height: 300, marginTop: 30 }}>
-          <ResponsiveContainer>
-            <PieChart>
-              <Pie
-                data={chartData}
-                dataKey="value"
-                cx="50%"
-                cy="50%"
-                outerRadius={100}
-                label
-              >
-                {chartData.map((_, index) => (
-                  <Cell key={index} fill={COLORS[index]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
+          <Table
+            columns={columns}
+            dataSource={filtered}
+            pagination={{ pageSize: 7 }}
+            rowClassName={(record) => `ant-table-row ${record.type}`} // kirim / chiqim qo‘shib beradi
+            rowKey="id"
+          />
         </div>
       </div>
     </section>

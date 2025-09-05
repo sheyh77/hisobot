@@ -1,12 +1,9 @@
 .dashboard {
-    padding: 30px;
-
     &-wrap {
         width: 100%;
         display: flex;
         flex-direction: column;
         gap: 50px;
-        padding: 0 50px;
     }
 
     &-title {
@@ -30,33 +27,48 @@
     }
 
     &-cards-balance {
-        width: 600px;
+        width: calc(600px - 60px);
         height: 200px;
-        background-color: #ecffe0;
-        border-radius: 20px;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         gap: 10px;
+        border-radius: 20px;
         box-shadow: 1px 1px 5px #efeff0;
+        background-color: #ecffe0;
+
+        @media screen and (max-width: 1007px){
+            width: 260px;
+        }
+        
+        @media screen and (max-width: 990px){
+            width: 200px;
+        }
 
         @media screen and (max-width: 911px){
             width: 300px;
         }
 
-        @media screen and (max-width: 1007px){
-            width: 260px;
+        @media screen and (max-width: 810px){
+            width: 150px;
+            height: 150px;
         }
 
-        @media screen and (max-width: 721px){
-            width: 200px;
+        @media screen and (max-width: 591px){
+            width: 120px;
+            height: 120px;
+        }
+
+        @media screen and (max-width: 501px){
+            width: calc(50% - 30px);
         }
     }
 
     &-cards-balance-title {
         font-size: 18px;
         font-weight: 500;
+        text-align: center;
     }
 
     &-cards-balance-money {
@@ -72,8 +84,8 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
+        align-items: center;
         gap: 10px;
-        padding-left: 50px;
 
         @media screen and (max-width: 911px){
             width: 300px;
@@ -83,8 +95,30 @@
             width: 260px;
         }
 
-        @media screen and (max-width: 721px){
+        @media screen and (max-width: 990px){
             width: 200px;
+        }
+
+        @media screen and (max-width: 810px){
+            width: 150px;
+            height: 150px;
+        }
+
+        @media screen and (max-width: 591px){
+            width: 120px;
+            height: 120px;
+        }
+    }
+
+    &-cards-income {
+        @media screen and (max-width: 501px){
+            width: 50%;
+        }
+    }
+
+    &-cards-output {
+        @media screen and (max-width: 501px){
+           width: 100%; 
         }
     }
 
@@ -97,7 +131,11 @@
         }
 
         @media screen and (max-width: 721px){
-            font-size: 16px;
+            font-size: 14px;
+        }
+
+        @media screen and (max-width: 591px){
+            font-size: 10px;
         }
     }
 
@@ -110,7 +148,11 @@
         }
 
         @media screen and (max-width: 721px){
-            font-size: 16px;
+            font-size: 14px;
+        }
+
+        @media screen and (max-width: 591px){
+            font-size: 10px;
         }
     }
 
@@ -120,5 +162,9 @@
 
     &-cards-sum-red {
         color: red;
+
+        @media screen and (max-width: 501px){
+            font-size: 18px;
+        }
     }
 }

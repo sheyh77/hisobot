@@ -1,20 +1,8 @@
 import React, { useRef } from 'react'
 import { Link, Outlet } from 'react-router-dom';
-import MenuIcon from "../assets/icon/MenuIcon";
-import MenuCloseIcon from "../assets/icon/MenuCloseIcon";
+import Dashboard from "../assets/icon/DashboardIcon";
 
 function Header() {
-
-  const MenuRef = useRef(document.querySelector(".header-menu-nav"))
-
-  function MenuOpen() {
-    MenuRef.current.classList.add("active")
-  }
-
-  function MenuClose() {
-    MenuRef.current.classList.remove("active")
-  }
-
   return (
     <header className="header">
       <div className="cantainer">
@@ -26,21 +14,32 @@ function Header() {
             <Link to="/hisobot" className="header-left-menu-title">Hisobot</Link>
             <Link to="/sozlamalar" className="header-left-menu-title">Sozlamalar</Link>
           </div>
-          <button className='header-menu-btn' onClick={MenuOpen}>
-            <MenuIcon />
-          </button>
 
           {/* responsive */}
-          <div className="header-menu-nav" ref={MenuRef}>
-            <button className='header-menu-nav-close' onClick={MenuClose}>
-              <MenuCloseIcon />
-            </button>
-            <Link to="/" className="header-logo">Logo</Link>
-            <div className="header-left-nav">
-              <Link to="/" className="header-left-nav-title">Asosiy</Link>
-              <Link to="/kirim-chiqim" className="header-left-nav-title">Kirim-chiqim</Link>
-              <Link to="/hisobot" className="header-left-nav-title">Hisobot</Link>
-              <Link to="/sozlamalar" className="header-left-nav-title">Sozlamalar</Link>
+          <div className="header-menu-nav">
+            <div className="header-menu-nav-block">
+              <Link to="/ ">
+                <Dashboard />
+                <p className="header-menu-nav-title">Asosiy</p>
+              </Link>
+            </div>
+            <div className="header-menu-nav-block">
+              <Link to="/kirim-chiqim">
+                <Dashboard />
+                <p className="header-menu-nav-title">Asosiy</p>
+              </Link>
+            </div>
+            <div className="header-menu-nav-block">
+              <Link to="/hisobot">
+                <Dashboard />
+                <p className="header-menu-nav-title">Asosiy</p>
+              </Link>
+            </div>
+            <div className="header-menu-nav-block">
+              <Link to="/sozlamalar">
+                <Dashboard />
+                <p className="header-menu-nav-title">Asosiy</p>
+              </Link>
             </div>
           </div>
 

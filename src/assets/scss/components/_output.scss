@@ -1,8 +1,10 @@
 .output {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
+    &-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 80vh;
+    }
 
     &-box {
         display: flex;

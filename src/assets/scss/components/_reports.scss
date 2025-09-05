@@ -1,3 +1,133 @@
 .hisobot {
-    
+  padding-bottom: 50px;
+
+  .hisobot-wrap {
+    .ant-table {
+      width: 100%;
+    }
+
+    @media (max-width: 647px) {
+      .ant-table-thead {
+        display: none; // sarlavhalar yashirinadi
+      }
+
+      .ant-table-row {
+        display: block;
+        margin-bottom: 20px;
+        padding: 18px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateY(-5px) scale(1.02);
+          box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+        }
+
+        // gradient chiziq chap tomonda
+        &::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: 100%;
+          width: 6px;
+          border-radius: 20px 0 0 20px;
+        }
+      }
+
+      /* Kirim uchun ranglar */
+      .ant-table-row.kirim::before {
+        background: linear-gradient(180deg, #22c55e, #15803d);
+      }
+      .ant-table-row.kirim .ant-table-cell:nth-child(5) span {
+        color: #16a34a;
+        font-weight: 700;
+      }
+      .ant-table-row.kirim .ant-tag {
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        color: #fff; // oq rang yozuv
+      }
+
+      /* Chiqim uchun ranglar */
+      .ant-table-row.chiqim::before {
+        background: linear-gradient(180deg, #ef4444, #991b1b);
+      }
+      .ant-table-row.chiqim .ant-table-cell:nth-child(5) span {
+        color: #ef4444;
+        font-weight: 700;
+      }
+      .ant-table-row.chiqim .ant-tag {
+        background: linear-gradient(135deg, #ef4444, #b91c1c);
+        color: #fff; // oq rang yozuv
+      }
+
+      /* umumiy ant-tag style */
+      .ant-tag {
+        display: inline-block;
+        padding: 3px 8px; // kichikroq qildim
+        min-width: 65px;  // width kichraytirildi
+        text-align: center;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        border: none;
+      }
+
+      .ant-table-cell {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border: none !important;
+        font-size: 15px;
+        font-weight: 500;
+        color: #1f2937;
+        border-bottom: 1px dashed #e5e7eb;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &::before {
+          font-weight: 600;
+          color: #6b7280;
+          flex: 1;
+          font-size: 14px;
+        }
+
+        span {
+          flex: 2;
+          text-align: right;
+          color: #111827;
+        }
+
+        &:nth-child(1)::before {
+          content: "#️⃣ Tartib";
+        }
+        &:nth-child(2)::before {
+          content: "📅 Sana";
+        }
+        &:nth-child(3)::before {
+          content: "⏰ Soat";
+        }
+        &:nth-child(4)::before {
+          content: "📌 Turi";
+        }
+        &:nth-child(5)::before {
+          content: "💰 Summa";
+        }
+        &:nth-child(6)::before {
+          content: "📝 Izoh";
+        }
+      }
+    }
+  }
 }

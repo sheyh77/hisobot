@@ -33,33 +33,37 @@ function Output() {
 
   return (
     <section className="output">
-      <div className="output-box">
-        <h2>Kirim/Chiqim kiritish</h2>
-        <div className="output-inp">
-          <input
-            type="number"
-            placeholder="Summani kiriting"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Izoh (ixtiyoriy)"
-            value={desc}
-            onChange={(e) => setDesc(e.target.value)}
-          />
-          <select value={type} onChange={(e) => setType(e.target.value)}>
-            <option value="kirim">Kirim</option>
-            <option value="chiqim">Chiqim</option>
-          </select>
-          <button onClick={handleSave} className="output-save-button">Saqlash</button>
+      <div className="cantainer">
+        <div className="output-wrap">
+          <div className="output-box">
+            <h2>Kirim/Chiqim kiritish</h2>
+            <div className="output-inp">
+              <input
+                type="number"
+                placeholder="Summani kiriting"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+              />
+              <input
+                type="text"
+                placeholder="Izoh (ixtiyoriy)"
+                value={desc}
+                onChange={(e) => setDesc(e.target.value)}
+              />
+              <select value={type} onChange={(e) => setType(e.target.value)}>
+                <option value="kirim">Kirim</option>
+                <option value="chiqim">Chiqim</option>
+              </select>
+              <button onClick={handleSave} className="output-save-button">Saqlash</button>
 
-          {/* 🔹 Xabar chiqishi */}
-          {message && (
-            <p style={{ color: message.startsWith("✅") ? "green" : "red", marginTop: "10px" }}>
-              {message}
-            </p>
-          )}
+              {/* 🔹 Xabar chiqishi */}
+              {message && (
+                <p style={{ color: message.startsWith("✅") ? "green" : "red", marginTop: "10px" }}>
+                  {message}
+                </p>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </section>
