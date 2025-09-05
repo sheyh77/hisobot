@@ -1,13 +1,20 @@
 import React, { useRef } from 'react'
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import Dashboard from "../assets/icon/DashboardIcon";
+import { HomeOutlined, SwapOutlined, BarChartOutlined, SettingOutlined } from "@ant-design/icons";
 
 function Header() {
+  const location = useLocation();
+
+  const isActive = (path) => {
+    return location.pathname === path ? "active" : "";
+  };
+
   return (
     <header className="header">
       <div className="cantainer">
         <div className="header-wrap">
-          <Link to="/" className="header-logo">Logo</Link>
+          <Link to="/" className="header-logo">Moliyam</Link>
           <div className="header-left-menu">
             <Link to="/" className="header-left-menu-title">Asosiy</Link>
             <Link to="/kirim-chiqim" className="header-left-menu-title">Kirim-chiqim</Link>
@@ -17,30 +24,33 @@ function Header() {
 
           {/* responsive */}
           <div className="header-menu-nav">
-            <div className="header-menu-nav-block">
-              <Link to="/ ">
-                <Dashboard />
+            <Link to="/">
+              <div className={`header-menu-nav-block ${isActive("/")}`}>
+                <HomeOutlined />
                 <p className="header-menu-nav-title">Asosiy</p>
-              </Link>
-            </div>
-            <div className="header-menu-nav-block">
-              <Link to="/kirim-chiqim">
-                <Dashboard />
-                <p className="header-menu-nav-title">Asosiy</p>
-              </Link>
-            </div>
-            <div className="header-menu-nav-block">
-              <Link to="/hisobot">
-                <Dashboard />
-                <p className="header-menu-nav-title">Asosiy</p>
-              </Link>
-            </div>
-            <div className="header-menu-nav-block">
-              <Link to="/sozlamalar">
-                <Dashboard />
-                <p className="header-menu-nav-title">Asosiy</p>
-              </Link>
-            </div>
+              </div>
+            </Link>
+
+            <Link to="/kirim-chiqim">
+              <div className={`header-menu-nav-block ${isActive("/kirim-chiqim")}`}>
+                <SwapOutlined />
+                <p className="header-menu-nav-title">Kirim-chiqim</p>
+              </div>
+            </Link>
+
+            <Link to="/hisobot">
+              <div className={`header-menu-nav-block ${isActive("/hisobot")}`}>
+                <BarChartOutlined />
+                <p className="header-menu-nav-title">Hisobot</p>
+              </div>
+            </Link>
+
+            <Link to="/sozlamalar">
+              <div className={`header-menu-nav-block ${isActive("/sozlamalar")}`}>
+                <SettingOutlined />
+                <p className="header-menu-nav-title">Sozlamalar</p>
+              </div>
+            </Link>
           </div>
 
         </div>

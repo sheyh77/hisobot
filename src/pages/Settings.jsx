@@ -1,104 +1,124 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Form, Input, Button, Upload, Avatar, Card, message, Flex } from "antd";
+import { UserOutlined, UploadOutlined } from "@ant-design/icons";
+import Column from "antd/es/table/Column";
 
 function Settings() {
-  const [telegramUser, setTelegramUser] = useState(""); // faqat username
-  const [darkMode, setDarkMode] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [notifyStatus, setNotifyStatus] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [avatar, setAvatar] = useState(null);
 
-  // 🔹 Sozlamalarni saqlash
-  const handleSave = async () => {
-    if (!telegramUser.trim()) {
-      setNotifyStatus("❌ Avval username kiriting");
-      return;
-    }
+  // Refreshdan keyin avatarni localStorage dan olish
+  useEffect(() => {
+    const savedAvatar = localStorage.getItem("avatar");
+    if (savedAvatar) setAvatar(savedAvatar);
+  }, []);
 
-    setSaving(true);
-    try {
-      await fetch("https://a139ac647c5e2feb.mokky.dev/settings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ telegramUser, darkMode }),
-      });
+  const onFinish = (values) => {
+    setLoading(true);
 
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
-    } catch (err) {
-      console.error("❌ Saqlashda xatolik:", err);
-      setNotifyStatus("❌ Saqlashda xatolik yuz berdi");
-    } finally {
-      setSaving(false);
-    }
+    const formData = { ...values, avatar };
+
+    fetch("http://localhost:5000/api/user/update", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    })
+      .then((res) => res.json())
+      .then(() => {
+        message.success("✅ Ma’lumotlar yangilandi");
+      })
+      .catch(() => {
+        message.error("❌ Xatolik yuz berdi");
+      })
+      .finally(() => setLoading(false));
   };
 
-  // 🔹 Test xabar yuborish
-  const testNotify = async () => {
-    if (!telegramUser.trim()) {
-      setNotifyStatus("❌ Username kiriting");
-      return;
-    }
-
-    try {
-      const res = await fetch("http://localhost:5000/notify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: telegramUser.replace("@", ""), // @ belgisiz yuboramiz
-          message: "✅ Hisobotdan test xabar yuborildi!",
-        }),
-      });
-
-      const data = await res.json();
-      if (data.ok) {
-        setNotifyStatus("✅ Xabar yuborildi!");
-      } else {
-        setNotifyStatus("❌ Yuborilmadi: " + (data.description || "Xato"));
-      }
-    } catch (err) {
-      console.error("❌ Server xatoligi:", err);
-      setNotifyStatus("❌ Serverga ulanishda xatolik");
-    }
-
-    setTimeout(() => setNotifyStatus(""), 3000);
+  const handleUpload = (file) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setAvatar(e.target.result);
+      localStorage.setItem("avatar", e.target.result); // localStorage ga yozamiz
+    };
+    reader.readAsDataURL(file);
+    return false; // yuklashni to‘xtatadi, faqat preview
   };
 
   return (
-    <section className="settings">
-      <h2>⚙️ Sozlamalar</h2>
-
-      {/* Telegram Username */}
-      <div className="settings-item">
-        <label>Telegram Username:</label>
-        <input
-          type="text"
-          value={telegramUser}
-          onChange={(e) => setTelegramUser(e.target.value)}
-          placeholder="@username"
-        />
-        <button onClick={testNotify}>Test yuborish</button>
-        {notifyStatus && <p>{notifyStatus}</p>}
-      </div>
-
-      {/* Dark Mode */}
-      <div className="settings-item">
-        <label>
-          <input
-            type="checkbox"
-            checked={darkMode}
-            onChange={(e) => setDarkMode(e.target.checked)}
+    <div
+      className="settings-page"
+      style={{ display: "flex", justifyContent: "center", padding: "30px" }}
+    >
+      <Card
+        style={{
+          maxWidth: 500,
+          width: "100%",
+          borderRadius: 20,
+          boxShadow: "0 8px 25px rgba(0,0,0,0.1)",
+          overflow: "hidden",
+        }}
+        styles={{ padding: "30px" }}
+      >
+        <div style={{ textAlign: "center", marginBottom: 20 }} className="settings-image">
+          <Avatar
+            size={100}
+            icon={<UserOutlined />}
+            src={avatar}
+            style={{
+              marginBottom: 15,
+              border: "4px solid #1890ff",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+            }}
           />
-          🌙 Tungi rejim
-        </label>
-      </div>
+          <Upload showUploadList={false} beforeUpload={handleUpload}>
+            <Button icon={<UploadOutlined />}>Profil rasmini tanlash</Button>
+          </Upload>
+        </div>
 
-      {/* Save button */}
-      <button onClick={handleSave} disabled={saving}>
-        {saving ? "⏳ Saqlanmoqda..." : "💾 Saqlash"}
-      </button>
+        <Form layout="vertical" onFinish={onFinish}>
+          <Form.Item
+            label="👤 Ism"
+            name="name"
+            rules={[{ required: true, message: "Ismni kiriting" }]}
+          >
+            <Input placeholder="Ismingizni kiriting" />
+          </Form.Item>
 
-      {saved && <p style={{ color: "green" }}>✅ Sozlamalar saqlandi</p>}
-    </section>
+          <Form.Item
+            label="📱 Telefon"
+            name="phone"
+            rules={[{ required: true, message: "Telefonni kiriting" }]}
+          >
+            <Input placeholder="+998 90 123 45 67" />
+          </Form.Item>
+
+          <Form.Item label="🏠 Manzil" name="address">
+            <Input placeholder="Manzilingizni kiriting" />
+          </Form.Item>
+
+          <Form.Item label="📧 Email" name="email">
+            <Input placeholder="Emailingizni kiriting" />
+          </Form.Item>
+
+          <Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              style={{
+                width: "100%",
+                height: 45,
+                borderRadius: 12,
+                fontSize: 16,
+                fontWeight: 600,
+                background: "linear-gradient(135deg, #4f46e5, #3b82f6)",
+              }}
+            >
+              💾 Saqlash
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
+    </div>
   );
 }
 
