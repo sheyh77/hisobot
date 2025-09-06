@@ -1,22 +1,36 @@
 import React, { useState, useEffect } from "react";
-import { Form, Input, Button, Upload, Avatar, Card, message, Flex } from "antd";
-import { UserOutlined, UploadOutlined } from "@ant-design/icons";
-import Column from "antd/es/table/Column";
+import { Form, Input, Button, Upload, Avatar, Card, message } from "antd";
+import { UserOutlined, UploadOutlined, LogoutOutlined } from "@ant-design/icons";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function Settings() {
+  const { user, login, logout } = useAuth();
   const [loading, setLoading] = useState(false);
   const [avatar, setAvatar] = useState(null);
+  const [form] = Form.useForm();
+  const navigate = useNavigate(); // 🔹 navigate qo‘shildi
 
-  // Refreshdan keyin avatarni localStorage dan olish
+  // Refreshdan keyin avatarni olish
   useEffect(() => {
     const savedAvatar = localStorage.getItem("avatar");
     if (savedAvatar) setAvatar(savedAvatar);
-  }, []);
+
+    if (user) {
+      form.setFieldsValue({
+        name: user.name || "",
+        phone: user.phone || "",
+        address: user.address || "",
+        email: user.email || "",
+      });
+    }
+  }, [user, form]);
 
   const onFinish = (values) => {
     setLoading(true);
-
     const formData = { ...values, avatar };
+
+    login(formData);
 
     fetch("http://localhost:5000/api/user/update", {
       method: "POST",
@@ -37,17 +51,19 @@ function Settings() {
     const reader = new FileReader();
     reader.onload = (e) => {
       setAvatar(e.target.result);
-      localStorage.setItem("avatar", e.target.result); // localStorage ga yozamiz
+      localStorage.setItem("avatar", e.target.result);
     };
     reader.readAsDataURL(file);
-    return false; // yuklashni to‘xtatadi, faqat preview
+    return false;
+  };
+
+  const handleLogout = () => {
+    logout();           // 🔹 userni tozalaydi
+    navigate("/login"); // 🔹 login sahifaga qaytaradi
   };
 
   return (
-    <div
-      className="settings-page"
-      style={{ display: "flex", justifyContent: "center", padding: "30px" }}
-    >
+    <div className="settings-page" style={{ display: "flex", justifyContent: "center", padding: "30px" }}>
       <Card
         style={{
           maxWidth: 500,
@@ -56,9 +72,9 @@ function Settings() {
           boxShadow: "0 8px 25px rgba(0,0,0,0.1)",
           overflow: "hidden",
         }}
-        styles={{ padding: "30px" }}
+        styles={{ body: { padding: "30px" } }}
       >
-        <div style={{ textAlign: "center", marginBottom: 20 }} className="settings-image">
+        <div style={{ textAlign: "center", marginBottom: 20, position: "relative" }} className="settings-image">
           <Avatar
             size={100}
             icon={<UserOutlined />}
@@ -72,9 +88,26 @@ function Settings() {
           <Upload showUploadList={false} beforeUpload={handleUpload}>
             <Button icon={<UploadOutlined />}>Profil rasmini tanlash</Button>
           </Upload>
+
+          {/* Logout tugmasi */}
+          <Button
+            danger
+            icon={<LogoutOutlined />}
+            onClick={handleLogout}
+            style={{
+              position: "absolute",
+              right: 0,
+              top: 0,
+              borderRadius: 8,
+              fontWeight: 600,
+            }}
+          >
+            Chiqish
+          </Button>
         </div>
 
-        <Form layout="vertical" onFinish={onFinish}>
+        {/* Form */}
+        <Form layout="vertical" form={form} onFinish={onFinish}>
           <Form.Item
             label="👤 Ism"
             name="name"
@@ -83,11 +116,7 @@ function Settings() {
             <Input placeholder="Ismingizni kiriting" />
           </Form.Item>
 
-          <Form.Item
-            label="📱 Telefon"
-            name="phone"
-            rules={[{ required: true, message: "Telefonni kiriting" }]}
-          >
+          <Form.Item label="📱 Telefon" name="phone">
             <Input placeholder="+998 90 123 45 67" />
           </Form.Item>
 

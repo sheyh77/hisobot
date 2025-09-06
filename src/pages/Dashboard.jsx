@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from "react";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid,
-  Tooltip, Legend, ResponsiveContainer
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from "recharts";
+import { useAuth } from "../context/AuthContext";
 
 function Dashboard() {
   const [transactions, setTransactions] = useState([]);
+  const { user } = useAuth();
 
   useEffect(() => {
-    fetch("https://a139ac647c5e2feb.mokky.dev/transactions")
+    if (!user) return;
+
+    fetch(`https://a139ac647c5e2feb.mokky.dev/transactions?userId=${user.id}`)
       .then(res => res.json())
       .then(data => setTransactions(data))
       .catch(err => console.error("Xatolik: ", err));
-  }, []);
+  }, [user]);
 
-  // Umumiy hisob-kitob
   const kirim = transactions
     .filter(t => t.type === "kirim")
     .reduce((sum, t) => sum + t.amount, 0);
@@ -25,15 +27,13 @@ function Dashboard() {
 
   const balance = kirim - chiqim;
 
-  // 🔹 O‘zbekcha kun nomlari
-  const kunlar = ["Dushanba", "Seshanba", "Chorshanba", "Payshanba", "Juma", "Shanba", "Yakshanba"];
+  // O‘zbekcha kunlar
+  const kunlar = ["Dushanba","Seshanba","Chorshanba","Payshanba","Juma","Shanba","Yakshanba"];
 
-  // 🔹 Joriy haftani olish
   const today = new Date();
   const firstDayOfWeek = new Date(today);
-  firstDayOfWeek.setDate(today.getDate() - today.getDay() + 1); // Dushanba
+  firstDayOfWeek.setDate(today.getDate() - today.getDay() + 1);
 
-  // 🔹 Haftalik data
   const haftalikData = kunlar.map((kun, index) => {
     const sana = new Date(firstDayOfWeek);
     sana.setDate(firstDayOfWeek.getDate() + index);
@@ -49,20 +49,20 @@ function Dashboard() {
 
     return {
       date: kun,
-      kirim: kunTrans
-        .filter(t => t.type === "kirim")
-        .reduce((sum, t) => sum + t.amount, 0),
-      chiqim: kunTrans
-        .filter(t => t.type === "chiqim")
-        .reduce((sum, t) => sum + t.amount, 0),
+      kirim: kunTrans.filter(t => t.type === "kirim").reduce((sum, t) => sum + t.amount, 0),
+      chiqim: kunTrans.filter(t => t.type === "chiqim").reduce((sum, t) => sum + t.amount, 0),
     };
   });
+
+  if (!user) {
+    return <h2 style={{ textAlign: "center" }}>⛔ Dashboard uchun login qiling</h2>;
+  }
 
   return (
     <section className="dashboard">
       <div className="cantainer">
         <div className="dashboard-wrap">
-          <h1 className="dashboard-title">Xush kelibsiz</h1>
+          <h1 className="dashboard-title">Salom, {user?.username} 👋</h1>
 
           {/* Cards */}
           <div className="dashboard-cards">

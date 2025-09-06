@@ -4,20 +4,25 @@ import {
   PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer
 } from "recharts";
 import jsPDF from "jspdf";
+import { useAuth } from "../context/AuthContext";
 
 const Reports = () => {
   const [transactions, setTransactions] = useState([]);
   const [filter, setFilter] = useState("all");
+  const { user } = useAuth(); // ✅ to‘g‘rilandi
 
   useEffect(() => {
-    fetch("https://a139ac647c5e2feb.mokky.dev/transactions")
-      .then((res) => res.json())
-      .then((data) => {
+    if (!user) return;
+
+    fetch(`https://a139ac647c5e2feb.mokky.dev/transactions?userId=${user.id}`)
+      .then(res => res.json())
+      .then(data => {
         const withKeys = data.map((t, i) => ({ ...t, key: t.id || i }));
         setTransactions(withKeys);
       })
-      .catch((err) => console.error("Xatolik:", err));
-  }, []);
+      .catch(err => console.error("Xatolik:", err));
+
+  }, [user]);
 
   const filtered = transactions.filter((t) =>
     filter === "all" ? true : t.type === filter
@@ -84,7 +89,7 @@ const Reports = () => {
     { name: "Chiqim", value: totalChiqim },
   ];
 
-  const COLORS = ["green", "red"];
+  const COLORS = ["#52c41a", "#ff4d4f"];
 
   const exportCSV = () => {
     const csvContent =
@@ -120,8 +125,7 @@ const Reports = () => {
         )} ${new Date(r.createdAt).toLocaleTimeString("uz-UZ", {
           hour: "2-digit",
           minute: "2-digit",
-        })} | ${r.type.toUpperCase()} | ${r.amount} so'm | ${r.desc || "-"
-        }`,
+        })} | ${r.type.toUpperCase()} | ${r.amount} so'm | ${r.desc || "-"}`,
         10,
         20 + i * 10
       );
@@ -130,12 +134,17 @@ const Reports = () => {
     doc.save("hisobot.pdf");
   };
 
+  if (!user) {
+    return <h2 style={{ textAlign: "center" }}>⛔ Hisobotni ko‘rish uchun login qiling</h2>;
+  }
+
   return (
     <section className="hisobot">
       <div className="cantainer">
         <div className="hisobot-wrap">
-          <h2>📊 Hisobot</h2>
+          <h2>📊 {user.username} ning hisobotlari</h2>
 
+          {/* Filter tugmalari */}
           <div style={{ marginBottom: 15 }}>
             <Button
               type={filter === "all" ? "primary" : "default"}
@@ -159,6 +168,7 @@ const Reports = () => {
             </Button>
           </div>
 
+          {/* Export tugmalari */}
           <div style={{ marginBottom: 15 }}>
             <Button onClick={exportCSV} style={{ marginRight: 10 }}>
               📥 CSV yuklab olish
@@ -166,13 +176,40 @@ const Reports = () => {
             <Button onClick={exportPDF}>📄 PDF yuklab olish</Button>
           </div>
 
+          {/* Jadval */}
           <Table
             columns={columns}
             dataSource={filtered}
             pagination={{ pageSize: 7 }}
-            rowClassName={(record) => `ant-table-row ${record.type}`} // kirim / chiqim qo‘shib beradi
             rowKey="id"
           />
+
+          {/* Umumiy natijalar */}
+          <div style={{ marginTop: 20 }}>
+            <h3>Umumiy kirim: {totalKirim.toLocaleString()} so'm</h3>
+            <h3>Umumiy chiqim: {totalChiqim.toLocaleString()} so'm</h3>
+          </div>
+
+          {/* PieChart */}
+          <div style={{ width: "100%", height: 300, marginTop: 30 }}>
+            <ResponsiveContainer>
+              <PieChart>
+                <Pie
+                  data={chartData}
+                  dataKey="value"
+                  nameKey="name"
+                  outerRadius={100}
+                  label
+                >
+                  {chartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
     </section>

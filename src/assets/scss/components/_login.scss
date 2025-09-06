@@ -1,0 +1,95 @@
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #4f46e5, #3b82f6);
+
+  .login-card {
+    background: #fff;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    width: 400px;
+    max-width: 90%;
+    text-align: center;
+
+    .login-title {
+      margin-bottom: 20px;
+      font-size: 24px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+
+      .login-input {
+        padding: 14px;
+        border: 1px solid #cbd5e1;
+        border-radius: 12px;
+        font-size: 16px;
+        transition: 0.3s;
+        outline: none;
+
+        &:focus {
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+      }
+
+      .login-button {
+        padding: 14px;
+        border: none;
+        border-radius: 12px;
+        font-size: 18px;
+        font-weight: 600;
+        background: linear-gradient(135deg, #4f46e5, #3b82f6);
+        color: #fff;
+        cursor: pointer;
+        transition: 0.3s;
+
+        &:hover {
+          background: linear-gradient(135deg, #4338ca, #2563eb);
+          transform: translateY(-2px);
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+      }
+    }
+
+    .login-error {
+      margin-top: 15px;
+      color: red;
+      font-weight: 500;
+    }
+  }
+}
+
+// 🔹 Responsive (647px dan kichik ekranlar uchun)
+@media (max-width: 647px) {
+  .login-card {
+    padding: 25px !important;
+    width: 100% !important;
+
+    .login-title {
+      font-size: 20px !important;
+    }
+
+    .login-form {
+      .login-input {
+        font-size: 14px !important;
+        padding: 12px !important;
+      }
+
+      .login-button {
+        font-size: 16px !important;
+        padding: 12px !important;
+      }
+    }
+  }
+}

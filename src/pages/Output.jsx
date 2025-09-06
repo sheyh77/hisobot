@@ -1,35 +1,75 @@
 import React, { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
 function Output() {
   const [amount, setAmount] = useState("");
-  const [type, setType] = useState("kirim"); // default = kirim
+  const [type, setType] = useState("kirim");
   const [desc, setDesc] = useState("");
-  const [message, setMessage] = useState(""); // 🔹 Saqlash xabari uchun
+  const [message, setMessage] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const { user } = useAuth();
 
   const handleSave = async () => {
-    if (!amount) return setMessage("❌ Summani kiriting!");
+    if (!user) {
+      setMessage("❌ Avval tizimga kiring (login).");
+      return;
+    }
+    if (!amount || Number(amount) <= 0) {
+      setMessage("❌ Summani to‘g‘ri kiriting!");
+      return;
+    }
+    if (type !== "kirim" && type !== "chiqim") {
+      setMessage("❌ Turi noto‘g‘ri!");
+      return;
+    }
 
+    setSaving(true);
     try {
-      await fetch("https://a139ac647c5e2feb.mokky.dev/transactions", {
+      const res = await fetch("https://a139ac647c5e2feb.mokky.dev/transactions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: Number(amount),
-          type, // kirim yoki chiqim
+          type,                 // "kirim" | "chiqim"
           desc,
           createdAt: new Date().toISOString(),
+          userId: user.id,      // 🔑 MUHIM: foydalanuvchiga bog‘laymiz
         }),
       });
 
+      if (!res.ok) {
+        throw new Error("Server xatosi");
+      }
+
       setAmount("");
       setDesc("");
-      setMessage("✅ Saqlandi!"); // 🔹 alert o‘rniga yashil yozuv
-      setTimeout(() => setMessage(""), 3000); // 3 sekundan keyin o‘chadi
+      setMessage("✅ Saqlandi!");
+      setTimeout(() => setMessage(""), 3000);
     } catch (err) {
       console.error("Xatolik: ", err);
       setMessage("❌ Xatolik yuz berdi!");
+    } finally {
+      setSaving(false);
     }
   };
+
+  if (!user) {
+    return (
+      <section className="output">
+        <div className="cantainer">
+          <div className="output-wrap">
+            <div className="output-box">
+              <h2>Kirim/Chiqim kiritish</h2>
+              <p style={{ color: "red", marginTop: 10 }}>
+                ⛔ Bu bo‘limdan foydalanish uchun avval login qiling.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="output">
@@ -43,6 +83,7 @@ function Output() {
                 placeholder="Summani kiriting"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
+                min="0"
               />
               <input
                 type="text"
@@ -54,11 +95,21 @@ function Output() {
                 <option value="kirim">Kirim</option>
                 <option value="chiqim">Chiqim</option>
               </select>
-              <button onClick={handleSave} className="output-save-button">Saqlash</button>
+              <button
+                onClick={handleSave}
+                className="output-save-button"
+                disabled={saving}
+              >
+                {saving ? "Saqlanmoqda..." : "Saqlash"}
+              </button>
 
-              {/* 🔹 Xabar chiqishi */}
               {message && (
-                <p style={{ color: message.startsWith("✅") ? "green" : "red", marginTop: "10px" }}>
+                <p
+                  style={{
+                    color: message.startsWith("✅") ? "green" : "red",
+                    marginTop: "10px",
+                  }}
+                >
                   {message}
                 </p>
               )}
