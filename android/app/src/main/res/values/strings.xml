@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">hisobot</string>
+    <string name="title_activity_main">hisobot</string>
+    <string name="package_name">com.modix.app</string>
+    <string name="custom_url_scheme">com.modix.app</string>
+</resources>
