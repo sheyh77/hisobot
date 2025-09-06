@@ -138,6 +138,18 @@ const Reports = () => {
     return <h2 style={{ textAlign: "center" }}>⛔ Hisobotni ko‘rish uchun login qiling</h2>;
   }
 
+  const today = new Date();
+  const todayTrans = transactions
+    .filter(t => {
+      const tDate = new Date(t.createdAt);
+      return (
+        tDate.getDate() === today.getDate() &&
+        tDate.getMonth() === today.getMonth() &&
+        tDate.getFullYear() === today.getFullYear()
+      );
+    })
+    .map((t, i) => ({ ...t, key: t.id || i }));
+
   return (
     <section className="hisobot">
       <div className="cantainer">
@@ -177,12 +189,36 @@ const Reports = () => {
           </div>
 
           {/* Jadval */}
-          <Table
+          {/* <Table
             columns={columns}
             dataSource={filtered}
             pagination={{ pageSize: 7 }}
             rowKey="id"
-          />
+            className="hisobot-bg"
+          /> */}
+          <div className="dashboard-transactions">
+            <h2 className="dashboard-transactions-title">Bugungi hisobot</h2>
+            <div className="dashboard-transactions-list">
+              {todayTrans.map((t) => (
+                <div key={t.key} className="transaction-card">
+                  <div className="transaction-icon">
+                    {t.type === "chiqim" ? (
+                      <span role="img" aria-label="minus">🛒</span>
+                    ) : (
+                      <span role="img" aria-label="plus">💰</span>
+                    )}
+                  </div>
+                  <div className="transaction-info">
+                    <p className="transaction-title">{t.desc || "No description"}</p>
+                    <p className="transaction-subtitle">{t.type === "chiqim" ? "Chiqim" : "Kirim"}</p>
+                  </div>
+                  <div className={`transaction-amount ${t.type === "chiqim" ? "red" : "green"}`}>
+                    {t.type === "chiqim" ? "-" : "+"}{t.amount.toLocaleString()} so'm
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
 
           {/* Umumiy natijalar */}
           <div style={{ marginTop: 20 }}>

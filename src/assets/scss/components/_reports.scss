@@ -2,6 +2,10 @@
   padding-bottom: 150px;
 
   .hisobot-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
     .ant-table {
       width: 100%;
     }
@@ -16,7 +20,7 @@
         margin-bottom: 20px;
         padding: 18px;
         border-radius: 20px;
-        background: rgba(255, 255, 255, 0.7);
+        background-color: #111c22;
         backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.4);
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
@@ -130,4 +134,19 @@
       }
     }
   }
+
+}
+
+.hisobot-bg {
+  background-color: #111c22;
+}
+
+.ant-table-content {
+  background-color: #111c22;
+  color: white;
+}
+
+.ant-table-row:hover, .ant-table-row-level-0:hover {
+  background-color: #111827;
+  color: black;
 }
