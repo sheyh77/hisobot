@@ -63,7 +63,7 @@ function Settings() {
   };
 
   return (
-    <div className="settings-page" style={{ display: "flex", justifyContent: "center", padding: "30px" }}>
+    <div className="settings-page" style={{ display: "flex", justifyContent: "center", padding: "10px 20px 150px 20px" }}>
       <Card
         style={{
           maxWidth: 500,
@@ -101,6 +101,7 @@ function Settings() {
               borderRadius: 8,
               fontWeight: 600,
             }}
+            className="settings-logout"
           >
             Chiqish
           </Button>

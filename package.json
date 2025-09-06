@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor/cli": "^7.4.3",
+    "@capacitor/core": "^7.4.3",
     "antd": "^5.27.3",
     "file-saver": "^2.0.5",
     "firebase": "^12.2.1",
