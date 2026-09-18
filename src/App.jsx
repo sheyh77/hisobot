@@ -6,7 +6,8 @@ import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import Login from "./login/Login";
 import Register from "./login/Register";
-import { AuthProvider, useAuth } from "./context/AuthContext";
+import Admin from "./pages/Admin";
+import { useAuth } from "./context/AuthContext";
 
 // PrivateRoute - foydalanuvchi login qilmagan bo‘lsa redirect qiladi
 const PrivateRoute = ({ children }) => {
@@ -19,13 +20,20 @@ const PrivateRoute = ({ children }) => {
   return user ? children : <Navigate to="/login" />;
 };
 
+const AdminRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return <div>Loading...</div>;
+  if (!user) return <Navigate to="/login?next=admin" replace />;
+  return user.role === "admin" || user.isAdmin === true ? children : <Navigate to="/?admin=denied" replace />;
+};
+
 function App() {
   return (
-    <AuthProvider>
-      <Routes>
+    <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
 
         {/* Protected Routes */}
         <Route
@@ -41,8 +49,7 @@ function App() {
           <Route path="hisobot" element={<Reports />} />
           <Route path="sozlamalar" element={<Settings />} />
         </Route>
-      </Routes>
-    </AuthProvider>
+    </Routes>
   );
 }
 

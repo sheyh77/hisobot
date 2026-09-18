@@ -3,11 +3,13 @@ import { Form, Input, Button, Upload, Avatar, Card, message } from "antd";
 import { UserOutlined, UploadOutlined, LogoutOutlined } from "@ant-design/icons";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { requestReminderPermission } from "../utils/reminders";
 
 function Settings() {
-  const { user, login, logout } = useAuth();
+  const { user, updateUser, logout } = useAuth();
   const [loading, setLoading] = useState(false);
   const [avatar, setAvatar] = useState(null);
+  const [remindersEnabled, setRemindersEnabled] = useState(false);
   const [form] = Form.useForm();
   const navigate = useNavigate(); // 🔹 navigate qo‘shildi
 
@@ -30,21 +32,16 @@ function Settings() {
     setLoading(true);
     const formData = { ...values, avatar };
 
-    login(formData);
+    updateUser(formData);
 
-    fetch("http://localhost:5000/api/user/update", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    })
-      .then((res) => res.json())
-      .then(() => {
-        message.success("✅ Ma’lumotlar yangilandi");
-      })
-      .catch(() => {
-        message.error("❌ Xatolik yuz berdi");
-      })
-      .finally(() => setLoading(false));
+    message.success("Ma'lumotlar yangilandi");
+    setLoading(false);
+  };
+
+  const enableReminders = async () => {
+    const granted = await requestReminderPermission();
+    setRemindersEnabled(granted);
+    message[granted ? "success" : "warning"](granted ? "Eslatmalar yoqildi" : "Bildirishnomaga ruxsat berilmadi");
   };
 
   const handleUpload = (file) => {
@@ -63,52 +60,33 @@ function Settings() {
   };
 
   return (
-    <div className="settings-page" style={{ display: "flex", justifyContent: "center", padding: "10px 20px 150px 20px" }}>
+    <div className="settings-page">
       <Card
-        style={{
-          maxWidth: 500,
-          width: "100%",
-          borderRadius: 20,
-          boxShadow: "0 8px 25px rgba(0,0,0,0.1)",
-          overflow: "hidden",
-        }}
-        styles={{ body: { padding: "30px" } }}
+        className="settings-card"
+        styles={{ body: { padding: 0 } }}
       >
-        <div style={{ textAlign: "center", marginBottom: 20, position: "relative" }} className="settings-image">
+        <div className="settings-cover"><span>PROFIL</span></div>
+        <div className="settings-profile-head">
           <Avatar
             size={100}
             icon={<UserOutlined />}
             src={avatar}
-            style={{
-              marginBottom: 15,
-              border: "4px solid #1890ff",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-            }}
+            className="settings-avatar"
           />
-          <Upload showUploadList={false} beforeUpload={handleUpload}>
-            <Button icon={<UploadOutlined />}>Profil rasmini tanlash</Button>
-          </Upload>
-
-          {/* Logout tugmasi */}
+          <div><h1>{user?.name || user?.username || "Profil"}</h1><p>{user?.email || "Shaxsiy moliya boshqaruvi"}</p><Upload showUploadList={false} beforeUpload={handleUpload}><Button icon={<UploadOutlined />}>Rasmni almashtirish</Button></Upload></div>
           <Button
             danger
             icon={<LogoutOutlined />}
             onClick={handleLogout}
-            style={{
-              position: "absolute",
-              right: 0,
-              top: 0,
-              borderRadius: 8,
-              fontWeight: 600,
-            }}
             className="settings-logout"
           >
             Chiqish
           </Button>
         </div>
 
-        {/* Form */}
-        <Form layout="vertical" form={form} onFinish={onFinish}>
+        <div className="settings-notice"><div><strong>Eslatmalar</strong><span>Rejalashtirilgan xarajatlar haqida xabar oling</span></div><button type="button" className={remindersEnabled ? "notice-switch on" : "notice-switch"} onClick={enableReminders}><i /></button></div>
+
+        <Form className="settings-form" layout="vertical" form={form} onFinish={onFinish}>
           <Form.Item
             label="👤 Ism"
             name="name"

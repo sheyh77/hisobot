@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
+
 * {
     margin: 0;
     padding: 0;
@@ -7,8 +9,8 @@
 html, body, #root {
     width: 100%;
     height: 100%;
-    background-color: #111c22;
-    color: white;
+    background: #f4f7f5;
+    color: #19312d;
 }
 
 #root {
@@ -25,7 +27,12 @@ button {
     border: none;
     background-color: transparent;
     cursor: pointer;
+    font: inherit;
 }
+
+body { font-family: "DM Sans", sans-serif; }
+h1, h2, h3, p { margin: 0; }
+h1, h2, h3, .header-logo { font-family: "Manrope", sans-serif; }
 
 .cantainer {
     max-width: 1550px;

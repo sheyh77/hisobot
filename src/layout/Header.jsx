@@ -1,10 +1,12 @@
-import React, { useRef } from 'react'
+import React from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import Dashboard from "../assets/icon/DashboardIcon";
-import { HomeOutlined, SwapOutlined, BarChartOutlined, SettingOutlined } from "@ant-design/icons";
+import { HomeOutlined, SwapOutlined, BarChartOutlined, SettingOutlined, CrownOutlined } from "@ant-design/icons";
+import { useAuth } from "../context/AuthContext";
 
 function Header() {
   const location = useLocation();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin" || user?.isAdmin === true;
 
   const isActive = (path) => {
     return location.pathname === path ? "active" : "";
@@ -20,6 +22,7 @@ function Header() {
             <Link to="/kirim-chiqim" className="header-left-menu-title">Kirim-chiqim</Link>
             <Link to="/hisobot" className="header-left-menu-title">Hisobot</Link>
             <Link to="/sozlamalar" className="header-left-menu-title">Sozlamalar</Link>
+            {isAdmin && <Link to="/admin" className="header-left-menu-title header-admin-link"><CrownOutlined /> Admin</Link>}
           </div>
 
           {/* responsive */}
@@ -51,6 +54,7 @@ function Header() {
                 <p className="header-menu-nav-title">Sozlamalar</p>
               </div>
             </Link>
+            {isAdmin && <Link to="/admin"><div className={`header-menu-nav-block ${isActive("/admin")}`}><CrownOutlined /><p className="header-menu-nav-title">Admin</p></div></Link>}
           </div>
 
         </div>

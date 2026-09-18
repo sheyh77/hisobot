@@ -1,14 +1,14 @@
 // public/firebase-messaging-sw.js
-importScripts("https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js");
-importScripts("https://www.gstatic.com/firebasejs/9.6.10/firebase-messaging.js");
+importScripts("https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/9.6.10/firebase-messaging-compat.js");
 
 firebase.initializeApp({
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID",
+  apiKey: "AIzaSyBEmcaIAjnInJWATupAblylegei3b3-4GM",
+  authDomain: "hisobot-app.firebaseapp.com",
+  projectId: "hisobot-app",
+  storageBucket: "hisobot-app.firebasestorage.app",
+  messagingSenderId: "755495664608",
+  appId: "1:755495664608:web:64bf6bceac916b07d10985",
 });
 
 const messaging = firebase.messaging();

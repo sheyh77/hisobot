@@ -1,21 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { Table, Tag, Button } from "antd";
+import { Button, message } from "antd";
 import {
   PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer
 } from "recharts";
 import jsPDF from "jspdf";
 import { useAuth } from "../context/AuthContext";
+import { cancelExpenseReminders } from "../utils/reminders";
+import { getUserTransactions, updateTransaction } from "../services/firestore";
 
 const Reports = () => {
   const [transactions, setTransactions] = useState([]);
   const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
+  const [updatingId, setUpdatingId] = useState(null);
   const { user } = useAuth(); // ✅ to‘g‘rilandi
 
   useEffect(() => {
     if (!user) return;
 
-    fetch(`https://a139ac647c5e2feb.mokky.dev/transactions?userId=${user.id}`)
-      .then(res => res.json())
+    getUserTransactions(user.id)
       .then(data => {
         const withKeys = data.map((t, i) => ({ ...t, key: t.id || i }));
         setTransactions(withKeys);
@@ -24,65 +27,19 @@ const Reports = () => {
 
   }, [user]);
 
-  const filtered = transactions.filter((t) =>
-    filter === "all" ? true : t.type === filter
-  );
-
-  const columns = [
-    {
-      title: "#",
-      dataIndex: "key",
-      key: "key",
-      render: (_, __, index) => index + 1,
-    },
-    {
-      title: "Sana",
-      dataIndex: "createdAt",
-      key: "sana",
-      render: (createdAt) =>
-        new Date(createdAt).toLocaleDateString("uz-UZ"),
-    },
-    {
-      title: "Soat",
-      dataIndex: "createdAt",
-      key: "soat",
-      render: (createdAt) =>
-        new Date(createdAt).toLocaleTimeString("uz-UZ", {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-    },
-    {
-      title: "Turi",
-      dataIndex: "type",
-      key: "type",
-      render: (type) => (
-        <Tag color={type === "kirim" ? "green" : "red"}>
-          {type.toUpperCase()}
-        </Tag>
-      ),
-    },
-    {
-      title: "Summa",
-      dataIndex: "amount",
-      key: "amount",
-      render: (amount) => `${amount.toLocaleString()} so'm`,
-    },
-    {
-      title: "Izoh",
-      dataIndex: "desc",
-      key: "desc",
-      render: (desc) => desc || "-",
-    },
-  ];
+  const filtered = transactions.filter((t) => {
+    const matchesType = filter === "all" || t.type === filter;
+    const matchesSearch = !search || `${t.desc || ""} ${t.category || ""}`.toLowerCase().includes(search.toLowerCase());
+    return matchesType && matchesSearch;
+  });
 
   const totalKirim = filtered
     .filter((t) => t.type === "kirim")
-    .reduce((sum, t) => sum + t.amount, 0);
+    .reduce((sum, t) => sum + Number(t.amount || 0), 0);
 
   const totalChiqim = filtered
     .filter((t) => t.type === "chiqim")
-    .reduce((sum, t) => sum + t.amount, 0);
+    .reduce((sum, t) => sum + Number(t.amount || 0), 0);
 
   const chartData = [
     { name: "Kirim", value: totalKirim },
@@ -134,21 +91,25 @@ const Reports = () => {
     doc.save("hisobot.pdf");
   };
 
+  const markAsSpent = async (transaction) => {
+    setUpdatingId(transaction.id);
+    try {
+      await updateTransaction(transaction.id, { status: "completed", spentAt: new Date().toISOString() });
+      setTransactions((current) => current.map((item) => item.id === transaction.id ? { ...item, status: "completed" } : item));
+      await cancelExpenseReminders(transaction.id);
+      message.success("Xarajat bajarildi va eslatmalar o'chirildi");
+    } catch (error) {
+      message.error(error.message);
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   if (!user) {
     return <h2 style={{ textAlign: "center" }}>⛔ Hisobotni ko‘rish uchun login qiling</h2>;
   }
 
-  const today = new Date();
-  const todayTrans = transactions
-    .filter(t => {
-      const tDate = new Date(t.createdAt);
-      return (
-        tDate.getDate() === today.getDate() &&
-        tDate.getMonth() === today.getMonth() &&
-        tDate.getFullYear() === today.getFullYear()
-      );
-    })
-    .map((t, i) => ({ ...t, key: t.id || i }));
+  const reportTransactions = filtered.map((t, i) => ({ ...t, key: t.id || i }));
 
   return (
     <section className="hisobot">
@@ -156,8 +117,7 @@ const Reports = () => {
         <div className="hisobot-wrap">
           <h2>📊 {user.username} ning hisobotlari</h2>
 
-          {/* Filter tugmalari */}
-          <div style={{ marginBottom: 15 }}>
+          <div className="report-toolbar">
             <Button
               type={filter === "all" ? "primary" : "default"}
               onClick={() => setFilter("all")}
@@ -180,8 +140,8 @@ const Reports = () => {
             </Button>
           </div>
 
-          {/* Export tugmalari */}
-          <div style={{ marginBottom: 15 }}>
+          <div className="report-toolbar report-actions">
+            <input className="report-search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Izoh yoki kategoriya bo'yicha qidirish" />
             <Button onClick={exportCSV} style={{ marginRight: 10 }}>
               📥 CSV yuklab olish
             </Button>
@@ -196,10 +156,10 @@ const Reports = () => {
             rowKey="id"
             className="hisobot-bg"
           /> */}
-          <div className="dashboard-transactions">
-            <h2 className="dashboard-transactions-title">Bugungi hisobot</h2>
+          <div className="dashboard-transactions dashboard-panel">
+            <h2 className="dashboard-transactions-title">Barcha tranzaksiyalar <span>({filtered.length})</span></h2>
             <div className="dashboard-transactions-list">
-              {todayTrans.map((t) => (
+              {reportTransactions.map((t) => (
                 <div key={t.key} className="transaction-card">
                   <div className="transaction-icon">
                     {t.type === "chiqim" ? (
@@ -210,10 +170,10 @@ const Reports = () => {
                   </div>
                   <div className="transaction-info">
                     <p className="transaction-title">{t.desc || "No description"}</p>
-                    <p className="transaction-subtitle">{t.type === "chiqim" ? "Chiqim" : "Kirim"}</p>
+                    <p className="transaction-subtitle">{t.status === "planned" ? `Reja: ${new Date(`${t.dueDate}T00:00:00`).toLocaleDateString("uz-UZ")}` : t.type === "chiqim" ? "Chiqim" : "Kirim"}</p>
                   </div>
-                  <div className={`transaction-amount ${t.type === "chiqim" ? "red" : "green"}`}>
-                    {t.type === "chiqim" ? "-" : "+"}{t.amount.toLocaleString()} so'm
+                  <div className={`transaction-amount ${t.status === "planned" ? "planned" : t.type === "chiqim" ? "red" : "green"}`}>
+                    {t.status === "planned" ? <Button size="small" loading={updatingId === t.id} onClick={() => markAsSpent(t)}>Sarflandi</Button> : `${t.type === "chiqim" ? "-" : "+"}${Number(t.amount || 0).toLocaleString()} so'm`}
                   </div>
                 </div>
               ))}

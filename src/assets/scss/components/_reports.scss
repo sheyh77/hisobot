@@ -150,3 +150,16 @@
   background-color: #111827;
   color: black;
 }
+
+.hisobot { color: #19312d; padding-bottom: 80px; }
+.hisobot-wrap { background: transparent; }
+.hisobot-wrap > h2 { font: 800 25px "Manrope", sans-serif; margin-bottom: 12px; }
+.report-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.report-toolbar .ant-btn { border-radius: 7px; border-color: #dce7e2; color: #59716b; }
+.report-toolbar .ant-btn-primary { background: #159a78; border-color: #159a78; color: white; }
+.report-search { flex: 1; min-width: 230px; padding: 10px 12px; border: 1px solid #dce7e2; border-radius: 7px; background: white; outline: none; font: 13px "DM Sans"; }
+.report-search:focus { border-color: #159a78; }
+.report-actions { align-items: center; }
+.report-actions .ant-btn { background: white; }
+.dashboard-transactions-title span { color: #91a19d; font-size: 13px; font-weight: 500; }
+.transaction-amount.planned { color: #b7793f; }.transaction-amount.planned .ant-btn { color: #087d5e; border-color: #b9ddca; border-radius: 6px; font-size: 11px; }.report-toolbar .ant-btn { margin-left: 0 !important; }

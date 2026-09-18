@@ -1,15 +1,12 @@
-@import url(https://fonts.googleapis.com/css?family=Montserrat:100,200,300,regular,500,600,700,800,900,100italic,200italic,300italic,italic,500italic,600italic,700italic,800italic,900italic);
-
 .header {
     width: 100%;
-    height: 100%;
-    border-right: 2px solid #dee1e6;
-    font-family: "Montserrat", sans-serif;
-    padding: 30px 0;
+    min-height: 100vh;
+    font-family: "DM Sans", sans-serif;
+    padding: 25px 0 50px;
     display: flex;
     flex-direction: column;
-    gap: 40px;
-    background-color: #111c22;
+    gap: 35px;
+    background: #f4f7f5;
 
     &-wrap {
         display: flex;
@@ -18,8 +15,11 @@
     }
 
     &-logo {
-        font-size: 36px;
-        font-weight: 600;
+        color: #19312d;
+        font-size: 27px;
+        font-weight: 800;
+        letter-spacing: -1px;
+        &::before { content: ""; display: inline-block; width: 11px; height: 11px; margin: 0 8px 3px 0; border-radius: 50%; background: #159a78; box-shadow: 7px 0 #f0a66a; }
 
         @media screen and (max-width: 742px) {
             width: 100%;
@@ -30,9 +30,11 @@
     &-left-menu {
         display: flex;
         align-items: center;
-        gap: 20px;
-        font-size: 17px;
-        font-weight: 500;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 600;
+
+        &-title { padding: 10px 14px; border-radius: 8px; color: #6c7f7b; transition: .2s ease; &:hover { color: #19312d; background: #e7f0ec; } }
 
         @media screen and (max-width: 742px) {
             display: none;
@@ -50,7 +52,7 @@
         z-index: 999;
         padding: 10px;
         display: none;
-        background-color: #111c22;
+        background-color: #19312d;
 
         @media screen and (max-width: 742px) {
             display: block;
@@ -64,12 +66,14 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        font-size: 14px;
+        font-size: 12px;
+        color: #b8ccc6;
+        gap: 5px;
     }
 }
 
 .header-menu-nav-block.active p {
-    color: #22c55e;
+    color: #86e0b3;
     /* yashil matn */
     font-weight: 600;
 }
@@ -79,6 +83,13 @@
 }
 
 .header-menu-nav-block.active svg {
-    fill: #22c55e;
+    color: #86e0b3;
     /* ikon rangini yashil qiladi */
+}
+
+@media screen and (max-width: 420px) {
+    .header-menu-nav { padding: 8px 5px; gap: 2px; }
+    .header-menu-nav > a { flex: 1; min-width: 0; }
+    .header-menu-nav-block { font-size: 10px; gap: 3px; white-space: nowrap; }
+    .header-menu-nav-block svg { font-size: 18px; }
 }

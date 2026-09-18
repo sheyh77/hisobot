@@ -1,0 +1,7 @@
+@media (min-width: 721px) {
+  .auth-card { justify-self: center; }
+}
+
+@media (max-width: 720px) {
+  .auth-card { margin-left: auto; margin-right: auto; }
+}

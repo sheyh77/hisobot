@@ -1,50 +1,56 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 
 function Login() {
   const { login } = useAuth();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const success = await login(username, password);
-    if (success) {
-      navigate("/");
-    } else {
-      setError("❌ Username yoki parol xato!");
+    setLoading(true);
+    try {
+      await login(email, password);
+      navigate(searchParams.get("next") === "admin" ? "/admin" : "/");
+    } catch (loginError) {
+      setError(`❌ ${loginError.message}`);
     }
+    setLoading(false);
   };
 
   return (
-    <div className="login-page">
-      <div className="login-card">
-        <h2 className="login-title">🔐 Kirish</h2>
+    <div className="auth-page login-page">
+      <div className="auth-visual"><span className="auth-kicker">MOLIYAVIY KUNDALIK</span><h1>Har bir so'm<br /><em>o'z o'rnida.</em></h1><p>Moliyangizni tushuning, rejalashtiring va xotirjam yashang.</p><div className="auth-orbit"><strong>24/7</strong><span>nazorat sizning qo'lingizda</span></div></div>
+      <div className="login-card auth-card">
+        <span className="auth-small">Xush kelibsiz</span><h2 className="login-title">Hisobingizga kiring</h2><p className="auth-lead">Moliyaviy kundaligingiz sizni kutmoqda.</p>
         <form onSubmit={handleSubmit} className="login-form">
-          <input
+          <label>Email yoki login<input
             type="text"
-            placeholder="👤 Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            placeholder="email yoki login"
+            value={email}
+            onChange={(e) => { setEmail(e.target.value); setError(""); }}
             required
             className="login-input"
-          />
-          <input
+          /></label>
+          <label>Parol<input
             type="password"
-            placeholder="🔑 Parol"
+            placeholder="Parolingizni kiriting"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => { setPassword(e.target.value); setError(""); }}
             required
             className="login-input"
-          />
-          <button type="submit" className="login-button">
-            Kirish
+          /></label>
+          <button type="submit" className="login-button" disabled={loading}>
+            {loading ? "Tekshirilmoqda..." : "Kirish →"}
           </button>
         </form>
         {error && <p className="login-error">{error}</p>}
+        <p className="auth-link">Yangi foydalanuvchimisiz? <Link to="/register">Hisob ochish</Link></p>
       </div>
     </div>
   );
