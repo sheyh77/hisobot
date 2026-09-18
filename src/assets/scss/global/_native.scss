@@ -13,6 +13,9 @@ html, body, #root {
     color: #19312d;
 }
 
+html { min-height: 100%; background: #f4f7f5; }
+body { min-height: 100%; padding-bottom: env(safe-area-inset-bottom); }
+
 #root {
     position: relative;
     overflow-x: hidden;
@@ -40,3 +43,7 @@ h1, h2, h3, .header-logo { font-family: "Manrope", sans-serif; }
     margin: 0 auto;
     padding: 0 20px;
 }
+
+.launch-screen { position: fixed; inset: 0; z-index: 3000; display: grid; place-content: center; justify-items: center; gap: 13px; background: #19312d; color: #f6f7f3; animation: launch-exit .45s ease 1.05s forwards; }
+.launch-mark { display: flex; gap: 7px; animation: launch-mark-in .8s cubic-bezier(.22, 1, .36, 1) both; }.launch-mark span { width: 22px; height: 22px; border-radius: 50%; background: #75d5ac; }.launch-mark span:last-child { background: #f0ae78; transform: translateY(11px); }.launch-screen strong { font: 800 31px "Manrope", sans-serif; letter-spacing: -1px; animation: launch-text-in .7s ease .18s both; }.launch-screen small { color: #a8c1b8; font-size: 10px; letter-spacing: .7px; animation: launch-text-in .7s ease .3s both; }
+@keyframes launch-mark-in { from { opacity: 0; transform: scale(.55) rotate(-18deg); } to { opacity: 1; transform: scale(1) rotate(0); } } @keyframes launch-text-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } } @keyframes launch-exit { to { opacity: 0; visibility: hidden; } }

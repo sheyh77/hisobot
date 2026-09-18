@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, message } from "antd";
+import { ArrowDownOutlined, ArrowUpOutlined, DownloadOutlined, SearchOutlined } from "@ant-design/icons";
 import {
   PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer
 } from "recharts";
@@ -40,6 +41,7 @@ const Reports = () => {
   const totalChiqim = filtered
     .filter((t) => t.type === "chiqim")
     .reduce((sum, t) => sum + Number(t.amount || 0), 0);
+  const plannedCount = filtered.filter((transaction) => transaction.status === "planned").length;
 
   const chartData = [
     { name: "Kirim", value: totalKirim },
@@ -115,37 +117,39 @@ const Reports = () => {
     <section className="hisobot">
       <div className="cantainer">
         <div className="hisobot-wrap">
-          <h2>📊 {user.username} ning hisobotlari</h2>
+          <div className="reports-hero"><div><p className="eyebrow">Moliyaviy tahlil</p><h1>{user.username}ning hisoboti</h1><p>Daromad va xarajatlaringizni bir joyda kuzating.</p></div><div className="reports-hero-mark">↗</div></div>
+
+          <div className="report-summary-grid"><div className="report-summary report-summary-income"><span><ArrowUpOutlined /> Jami kirim</span><strong>{totalKirim.toLocaleString("uz-UZ")} <small>so'm</small></strong></div><div className="report-summary report-summary-expense"><span><ArrowDownOutlined /> Jami chiqim</span><strong>{totalChiqim.toLocaleString("uz-UZ")} <small>so'm</small></strong></div><div className="report-summary report-summary-planned"><span>Rejalashtirilgan</span><strong>{plannedCount} <small>ta</small></strong></div></div>
 
           <div className="report-toolbar">
             <Button
               type={filter === "all" ? "primary" : "default"}
               onClick={() => setFilter("all")}
             >
-              Hammasi
+              Hammasi ({transactions.length})
             </Button>
             <Button
               type={filter === "kirim" ? "primary" : "default"}
               onClick={() => setFilter("kirim")}
               style={{ marginLeft: 10 }}
             >
-              Faqat kirim
+              Kirim
             </Button>
             <Button
               type={filter === "chiqim" ? "primary" : "default"}
               onClick={() => setFilter("chiqim")}
               style={{ marginLeft: 10 }}
             >
-              Faqat chiqim
+              Chiqim
             </Button>
           </div>
 
           <div className="report-toolbar report-actions">
-            <input className="report-search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Izoh yoki kategoriya bo'yicha qidirish" />
-            <Button onClick={exportCSV} style={{ marginRight: 10 }}>
-              📥 CSV yuklab olish
+            <div className="report-search-wrap"><SearchOutlined /><input className="report-search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Izoh yoki kategoriya bo'yicha qidirish" /></div>
+            <Button icon={<DownloadOutlined />} onClick={exportCSV}>
+              CSV
             </Button>
-            <Button onClick={exportPDF}>📄 PDF yuklab olish</Button>
+            <Button icon={<DownloadOutlined />} onClick={exportPDF}>PDF</Button>
           </div>
 
           {/* Jadval */}
@@ -161,13 +165,7 @@ const Reports = () => {
             <div className="dashboard-transactions-list">
               {reportTransactions.map((t) => (
                 <div key={t.key} className="transaction-card">
-                  <div className="transaction-icon">
-                    {t.type === "chiqim" ? (
-                      <span role="img" aria-label="minus">🛒</span>
-                    ) : (
-                      <span role="img" aria-label="plus">💰</span>
-                    )}
-                  </div>
+                  <div className={`transaction-icon ${t.type === "chiqim" ? "transaction-icon-expense" : ""}`}>{t.type === "chiqim" ? <ArrowDownOutlined /> : <ArrowUpOutlined />}</div>
                   <div className="transaction-info">
                     <p className="transaction-title">{t.desc || "No description"}</p>
                     <p className="transaction-subtitle">{t.status === "planned" ? `Reja: ${new Date(`${t.dueDate}T00:00:00`).toLocaleDateString("uz-UZ")}` : t.type === "chiqim" ? "Chiqim" : "Kirim"}</p>
@@ -181,13 +179,9 @@ const Reports = () => {
           </div>
 
           {/* Umumiy natijalar */}
-          <div style={{ marginTop: 20 }}>
-            <h3>Umumiy kirim: {totalKirim.toLocaleString()} so'm</h3>
-            <h3>Umumiy chiqim: {totalChiqim.toLocaleString()} so'm</h3>
-          </div>
-
-          {/* PieChart */}
-          <div style={{ width: "100%", height: 300, marginTop: 30 }}>
+          <div className="report-chart-panel">
+            <div className="report-chart-title"><div><p className="eyebrow">Nisbat</p><h2>Kirim va chiqim</h2></div><span>{totalKirim + totalChiqim ? Math.round((totalChiqim / (totalKirim + totalChiqim)) * 100) : 0}% sarf</span></div>
+          <div style={{ width: "100%", height: 245 }}>
             <ResponsiveContainer>
               <PieChart>
                 <Pie
@@ -205,6 +199,7 @@ const Reports = () => {
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
+          </div>
           </div>
         </div>
       </div>

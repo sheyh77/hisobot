@@ -43,16 +43,19 @@
 
     &-menu-nav {
         width: 100%;
-        height: 100px;
+        height: 68px;
         background-color: white;
         position: absolute;
         position: fixed;
-        bottom: 0;
+        bottom: calc(12px + env(safe-area-inset-bottom));
         left: 0;
         z-index: 999;
-        padding: 10px;
+        padding: 7px 10px;
         display: none;
         background-color: #19312d;
+
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(25, 49, 45, .22);
 
         @media screen and (max-width: 742px) {
             display: block;
