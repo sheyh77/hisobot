@@ -7,6 +7,7 @@ import Settings from "./pages/Settings";
 import Login from "./login/Login";
 import Register from "./login/Register";
 import Admin from "./pages/Admin";
+import Pro from "./pages/Pro";
 import { useAuth } from "./context/AuthContext";
 
 // PrivateRoute - foydalanuvchi login qilmagan bo‘lsa redirect qiladi
@@ -34,6 +35,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+        <Route path="/pro" element={<PrivateRoute><Pro /></PrivateRoute>} />
 
         {/* Protected Routes */}
         <Route

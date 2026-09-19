@@ -3,11 +3,12 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 
 function Login() {
-  const { login } = useAuth();
+  const { login, resetPassword } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resetMessage, setResetMessage] = useState("");
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -21,6 +22,20 @@ function Login() {
       setError(`❌ ${loginError.message}`);
     }
     setLoading(false);
+  };
+
+  const handleReset = async () => {
+    if (!email.includes("@")) {
+      setError("Parolni tiklash uchun email manzilini kiriting.");
+      return;
+    }
+    try {
+      await resetPassword(email);
+      setResetMessage("Parolni tiklash havolasi emailingizga yuborildi.");
+      setError("");
+    } catch (resetError) {
+      setError(resetError.code === "auth/user-not-found" ? "Bu email Firebase'da topilmadi." : "Parolni tiklashda xatolik yuz berdi.");
+    }
   };
 
   return (
@@ -48,8 +63,10 @@ function Login() {
           <button type="submit" className="login-button" disabled={loading}>
             {loading ? "Tekshirilmoqda..." : "Kirish →"}
           </button>
+          <button type="button" className="auth-reset" onClick={handleReset}>Parolni unutdingizmi?</button>
         </form>
         {error && <p className="login-error">{error}</p>}
+        {resetMessage && <p className="auth-success">{resetMessage}</p>}
         <p className="auth-link">Yangi foydalanuvchimisiz? <Link to="/register">Hisob ochish</Link></p>
       </div>
     </div>
