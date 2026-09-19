@@ -8,6 +8,9 @@ import Login from "./login/Login";
 import Register from "./login/Register";
 import Admin from "./pages/Admin";
 import Pro from "./pages/Pro";
+import ProPayment from "./pages/ProPayment";
+import Notifications from "./pages/Notifications";
+import AdminPayments from "./pages/AdminPayments";
 import { useAuth } from "./context/AuthContext";
 
 // PrivateRoute - foydalanuvchi login qilmagan bo‘lsa redirect qiladi
@@ -35,7 +38,10 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+        <Route path="/admin/tolovlar" element={<AdminRoute><AdminPayments /></AdminRoute>} />
         <Route path="/pro" element={<PrivateRoute><Pro /></PrivateRoute>} />
+        <Route path="/pro/tolov" element={<PrivateRoute><ProPayment /></PrivateRoute>} />
+        <Route path="/bildirishnomalar" element={<PrivateRoute><Notifications /></PrivateRoute>} />
 
         {/* Protected Routes */}
         <Route

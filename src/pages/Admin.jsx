@@ -9,9 +9,11 @@ import {
   TeamOutlined,
   AppstoreOutlined,
   UserOutlined,
+  CreditCardOutlined,
 } from "@ant-design/icons";
 import { useAuth } from "../context/AuthContext";
 import { createCategory, createNotification, getAllTransactions, getAllUsers, getCategories, removeCategory } from "../services/firestore";
+import { Link } from "react-router-dom";
 
 const defaultSections = [
   { id: "food", name: "Oziq-ovqat", color: "#e99b68" },
@@ -127,7 +129,7 @@ const Admin = () => {
         <div className="admin-brand"><span /> Moliyam <small>ADMIN</small></div>
         <div className="admin-profile"><div className="admin-avatar">{user.username?.slice(0, 1).toUpperCase() || "A"}</div><div><strong>{user.username}</strong><span>Administrator</span></div></div>
         <nav>{menu.map((item) => <button type="button" key={item.id} className={activeSection === item.id ? "active" : ""} onClick={() => setActiveSection(item.id)}>{item.icon}<span>{item.label}</span></button>)}</nav>
-        <div className="admin-sidebar-note"><BellOutlined /><span>Platforma nazorat ostida</span></div>
+        <Link to="/admin/tolovlar" className="admin-payment-link"><CreditCardOutlined /> Pro to'lovlar</Link><div className="admin-sidebar-note"><BellOutlined /><span>Platforma nazorat ostida</span></div>
       </aside>
 
       <main className="admin-content">

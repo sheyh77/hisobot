@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { HomeOutlined, SwapOutlined, BarChartOutlined, SettingOutlined, CrownOutlined } from "@ant-design/icons";
+import { HomeOutlined, SwapOutlined, BarChartOutlined, SettingOutlined, CrownOutlined, BellOutlined } from "@ant-design/icons";
 import { useAuth } from "../context/AuthContext";
 
 function Header() {
@@ -22,6 +22,7 @@ function Header() {
             <Link to="/kirim-chiqim" className="header-left-menu-title">Kirim-chiqim</Link>
             <Link to="/hisobot" className="header-left-menu-title">Hisobot</Link>
             <Link to="/sozlamalar" className="header-left-menu-title">Sozlamalar</Link>
+            <Link to="/bildirishnomalar" className="header-left-menu-title"><BellOutlined /> Xabarlar</Link>
             {isAdmin && <Link to="/admin" className="header-left-menu-title header-admin-link"><CrownOutlined /> Admin</Link>}
           </div>
 
@@ -54,6 +55,7 @@ function Header() {
                 <p className="header-menu-nav-title">Sozlamalar</p>
               </div>
             </Link>
+            <Link to="/bildirishnomalar"><div className={`header-menu-nav-block ${isActive("/bildirishnomalar")}`}><BellOutlined /><p className="header-menu-nav-title">Xabarlar</p></div></Link>
             {isAdmin && <Link to="/admin"><div className={`header-menu-nav-block ${isActive("/admin")}`}><CrownOutlined /><p className="header-menu-nav-title">Admin</p></div></Link>}
           </div>
 

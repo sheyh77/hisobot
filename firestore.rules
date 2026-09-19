@@ -30,5 +30,16 @@ service cloud.firestore {
       allow read: if isAdmin() || (signedIn() && (resource.data.audience == 'all' || resource.data.audience == request.auth.uid));
       allow update: if isAdmin();
     }
+
+    match /paymentMethods/{methodId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    match /paymentRequests/{requestId} {
+      allow create: if signedIn() && request.resource.data.userId == request.auth.uid;
+      allow read: if isAdmin() || (signedIn() && resource.data.userId == request.auth.uid);
+      allow update: if isAdmin();
+    }
   }
 }

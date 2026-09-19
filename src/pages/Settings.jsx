@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Form, Input, Button, Upload, Avatar, Card, message } from "antd";
 import { UserOutlined, UploadOutlined, LogoutOutlined } from "@ant-design/icons";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { requestReminderPermission } from "../utils/reminders";
 
 function Settings() {
@@ -85,6 +85,7 @@ function Settings() {
         </div>
 
         <div className="settings-notice"><div><strong>Eslatmalar</strong><span>Rejalashtirilgan xarajatlar haqida xabar oling</span></div><button type="button" className={remindersEnabled ? "notice-switch on" : "notice-switch"} onClick={enableReminders}><i /></button></div>
+        <Link to="/pro" className="settings-pro-link"><span><strong>Moliyam Pro</strong><small>Ko'proq nazorat va aqlli tahlil</small></span><b>Ko'rish →</b></Link>
 
         <Form className="settings-form" layout="vertical" form={form} onFinish={onFinish}>
           <Form.Item
