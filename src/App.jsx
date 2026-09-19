@@ -11,6 +11,7 @@ import Pro from "./pages/Pro";
 import ProPayment from "./pages/ProPayment";
 import Notifications from "./pages/Notifications";
 import AdminPayments from "./pages/AdminPayments";
+import Header from "./layout/Header";
 import { useAuth } from "./context/AuthContext";
 
 // PrivateRoute - foydalanuvchi login qilmagan bo‘lsa redirect qiladi
@@ -31,17 +32,19 @@ const AdminRoute = ({ children }) => {
   return user.role === "admin" || user.isAdmin === true ? children : <Navigate to="/?admin=denied" replace />;
 };
 
+const HeaderShell = ({ children }) => <><Header />{children}</>;
+
 function App() {
   return (
     <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
-        <Route path="/admin/tolovlar" element={<AdminRoute><AdminPayments /></AdminRoute>} />
+        <Route path="/admin" element={<AdminRoute><HeaderShell><Admin /></HeaderShell></AdminRoute>} />
+        <Route path="/admin/tolovlar" element={<AdminRoute><HeaderShell><AdminPayments /></HeaderShell></AdminRoute>} />
         <Route path="/pro" element={<PrivateRoute><Pro /></PrivateRoute>} />
-        <Route path="/pro/tolov" element={<PrivateRoute><ProPayment /></PrivateRoute>} />
-        <Route path="/bildirishnomalar" element={<PrivateRoute><Notifications /></PrivateRoute>} />
+        <Route path="/pro/tolov" element={<PrivateRoute><HeaderShell><ProPayment /></HeaderShell></PrivateRoute>} />
+        <Route path="/bildirishnomalar" element={<PrivateRoute><HeaderShell><Notifications /></HeaderShell></PrivateRoute>} />
 
         {/* Protected Routes */}
         <Route
