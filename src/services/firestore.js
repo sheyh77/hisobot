@@ -1,85 +1,22 @@
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  setDoc,
-  updateDoc,
-  where,
-} from "firebase/firestore";
-import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
-import { db } from "../lib/firebase";
+import { api } from "./api";
 
-const usersRef = collection(db, "users");
-const transactionsRef = collection(db, "transactions");
-const categoriesRef = collection(db, "categories");
-const notificationsRef = collection(db, "notifications");
-const paymentMethodsRef = collection(db, "paymentMethods");
-const paymentRequestsRef = collection(db, "paymentRequests");
-
-const withId = (snapshot) => ({ id: snapshot.id, ...snapshot.data() });
-
-export const getUserProfile = async (userId) => {
-  const snapshot = await getDoc(doc(db, "users", userId));
-  return snapshot.exists() ? withId(snapshot) : null;
-};
-
-export const saveUserProfile = (userId, values) => setDoc(doc(db, "users", userId), values, { merge: true });
-
-export const getUserTransactions = async (userId) => {
-  const snapshot = await getDocs(query(transactionsRef, where("userId", "==", userId)));
-  return snapshot.docs.map(withId).sort((first, second) => new Date(second.createdAt) - new Date(first.createdAt));
-};
-
-export const getAllTransactions = async () => {
-  const snapshot = await getDocs(transactionsRef);
-  return snapshot.docs.map(withId);
-};
-
-export const createTransaction = async (values) => withId(await addDoc(transactionsRef, values));
-
-export const updateTransaction = (transactionId, values) => updateDoc(doc(db, "transactions", transactionId), values);
-
-export const getAllUsers = async () => {
-  const snapshot = await getDocs(usersRef);
-  return snapshot.docs.map(withId);
-};
-
-export const getCategories = async () => {
-  const snapshot = await getDocs(categoriesRef);
-  return snapshot.docs.map(withId);
-};
-
-export const createCategory = async (values) => withId(await addDoc(categoriesRef, values));
-
-export const removeCategory = (categoryId) => deleteDoc(doc(db, "categories", categoryId));
-
-export const createNotification = async (values) => withId(await addDoc(notificationsRef, values));
-
-export const getUserNotifications = async (userId) => {
-  const [allSnapshot, ownSnapshot] = await Promise.all([
-    getDocs(query(notificationsRef, where("audience", "==", "all"))),
-    getDocs(query(notificationsRef, where("audience", "==", userId))),
-  ]);
-  const items = [...allSnapshot.docs, ...ownSnapshot.docs].map(withId);
-  return [...new Map(items.map((item) => [item.id, item])).values()].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-};
-
-export const getPaymentMethods = async () => (await getDocs(paymentMethodsRef)).docs.map(withId);
-export const createPaymentMethod = async (values) => withId(await addDoc(paymentMethodsRef, values));
-export const removePaymentMethod = (methodId) => deleteDoc(doc(db, "paymentMethods", methodId));
-export const getPaymentRequests = async (userId) => {
-  const snapshot = await getDocs(userId ? query(paymentRequestsRef, where("userId", "==", userId)) : paymentRequestsRef);
-  return snapshot.docs.map(withId).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-};
-export const createPaymentRequest = async (values) => withId(await addDoc(paymentRequestsRef, values));
-export const updatePaymentRequest = (requestId, values) => updateDoc(doc(db, "paymentRequests", requestId), values);
-export const uploadPaymentReceipt = async (userId, file) => {
-  const storage = getStorage();
-  const fileRef = ref(storage, `payment-receipts/${userId}/${Date.now()}-${file.name}`);
-  await uploadBytes(fileRef, file);
-  return getDownloadURL(fileRef);
-};
+export const getUserProfile = async () => (await api.get("/api/me")).user;
+export const saveUserProfile = (_userId, values) => api.patch("/api/me", values);
+export const getUserTransactions = () => api.get("/api/transactions");
+export const getAllTransactions = () => api.get("/api/admin/transactions");
+export const createTransaction = (values) => api.post("/api/transactions", values);
+export const updateTransaction = (transactionId, values) => api.patch(`/api/transactions/${transactionId}`, values);
+export const getAllUsers = () => api.get("/api/admin/users");
+export const getCategories = () => api.get("/api/categories");
+export const createCategory = (values) => api.post("/api/admin/categories", values);
+export const removeCategory = (categoryId) => api.delete(`/api/admin/categories/${categoryId}`);
+export const createNotification = (values) => api.post("/api/admin/notifications", values);
+export const getUserNotifications = () => api.get("/api/notifications");
+export const getPaymentMethods = () => api.get("/api/payment-methods");
+export const createPaymentMethod = (values) => api.post("/api/admin/payment-methods", values);
+export const removePaymentMethod = (methodId) => api.delete(`/api/admin/payment-methods/${methodId}`);
+export const getPaymentRequests = (userId) => api.get(userId ? "/api/payment-requests" : "/api/admin/payment-requests");
+export const createPaymentRequest = (values) => api.post("/api/payment-requests", values);
+export const updatePaymentRequest = (requestId, values) => api.patch(`/api/admin/payment-requests/${requestId}`, values);
+export const saveUserEntitlement = (userId, values) => api.patch(`/api/admin/users/${userId}/entitlement`, values);
+export const uploadPaymentReceipt = async (_userId, file) => new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(file); });

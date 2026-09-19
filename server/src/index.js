@@ -3,6 +3,7 @@ import cors from "cors";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 import admin from "firebase-admin";
+import crypto from "node:crypto";
 import { pool } from "./db.js";
 import { requireAdmin, requireAuth, signUser } from "./auth.js";
 
@@ -43,6 +44,11 @@ app.get("/api/me", requireAuth, async (request, response) => {
   if (!result.rows[0]) return response.status(404).json({ error: "USER_NOT_FOUND" });
   response.json({ user: userShape(result.rows[0]) });
 });
+app.patch("/api/me", requireAuth, async (request, response) => {
+  const { username, email, phone, address, avatar, notificationSettings } = request.body;
+  const result = await pool.query("UPDATE users SET username = COALESCE($1,username), email = COALESCE($2,email), phone = COALESCE($3,phone), address = COALESCE($4,address), avatar = COALESCE($5,avatar), notification_settings = COALESCE($6,notification_settings), updated_at = NOW() WHERE id = $7 RETURNING *", [username, email, phone, address, avatar, notificationSettings ? JSON.stringify(notificationSettings) : null, request.auth.id]);
+  response.json({ user: { ...userShape(result.rows[0]), phone: result.rows[0].phone, address: result.rows[0].address, avatar: result.rows[0].avatar, notificationSettings: result.rows[0].notification_settings } });
+});
 
 app.get("/api/transactions", requireAuth, async (request, response) => {
   const result = await pool.query("SELECT id, user_id AS \"userId\", amount, type, category, description AS desc, due_date AS \"dueDate\", status, created_at AS \"createdAt\", spent_at AS \"spentAt\" FROM transactions WHERE user_id = $1 ORDER BY created_at DESC", [request.auth.id]);
@@ -60,11 +66,20 @@ app.patch("/api/transactions/:id", requireAuth, async (request, response) => {
   if (!result.rows[0]) return response.status(404).json({ error: "TRANSACTION_NOT_FOUND" });
   response.json(result.rows[0]);
 });
+app.get("/api/admin/transactions", requireAuth, requireAdmin, async (_request, response) => response.json((await pool.query("SELECT id, user_id AS \"userId\", amount, type, category, description AS desc, due_date AS \"dueDate\", status, created_at AS \"createdAt\" FROM transactions ORDER BY created_at DESC")).rows));
+app.get("/api/categories", requireAuth, async (_request, response) => response.json((await pool.query("SELECT id, name, color FROM categories ORDER BY name")).rows));
+app.post("/api/admin/categories", requireAuth, requireAdmin, async (request, response) => { const result = await pool.query("INSERT INTO categories (name,color) VALUES ($1,$2) RETURNING id,name,color", [request.body.name, request.body.color || "#159a78"]); response.status(201).json(result.rows[0]); });
+app.delete("/api/admin/categories/:id", requireAuth, requireAdmin, async (request, response) => { await pool.query("DELETE FROM categories WHERE id = $1", [request.params.id]); response.status(204).end(); });
 
 app.post("/api/device-tokens", requireAuth, async (request, response) => {
   await pool.query("INSERT INTO device_tokens (user_id, token, platform) VALUES ($1,$2,$3) ON CONFLICT (token) DO UPDATE SET user_id = EXCLUDED.user_id", [request.auth.id, request.body.token, request.body.platform || "android"]);
   response.status(204).end();
 });
+
+app.get("/api/payment-requests", requireAuth, async (request, response) => response.json((await pool.query("SELECT id, user_id AS \"userId\", receipt_url AS \"receiptUrl\", status, admin_note AS \"adminNote\", created_at AS \"createdAt\" FROM payment_requests WHERE user_id = $1 ORDER BY created_at DESC", [request.auth.id])).rows));
+app.post("/api/payment-requests", requireAuth, async (request, response) => { const result = await pool.query("INSERT INTO payment_requests (user_id, receipt_url) VALUES ($1,$2) RETURNING id, user_id AS \"userId\", receipt_url AS \"receiptUrl\", status, created_at AS \"createdAt\"", [request.auth.id, request.body.receiptUrl]); response.status(201).json(result.rows[0]); });
+app.get("/api/admin/payment-requests", requireAuth, requireAdmin, async (_request, response) => response.json((await pool.query("SELECT id, user_id AS \"userId\", receipt_url AS \"receiptUrl\", status, admin_note AS \"adminNote\", created_at AS \"createdAt\" FROM payment_requests ORDER BY created_at DESC")).rows));
+app.patch("/api/admin/payment-requests/:id", requireAuth, requireAdmin, async (request, response) => { const result = await pool.query("UPDATE payment_requests SET status = $1, reviewed_at = NOW(), admin_note = $2 WHERE id = $3 RETURNING *", [request.body.status, request.body.adminNote || null, request.params.id]); if (!result.rows[0]) return response.status(404).json({ error: "PAYMENT_REQUEST_NOT_FOUND" }); response.json(result.rows[0]); });
 
 app.get("/api/notifications", requireAuth, async (request, response) => {
   const result = await pool.query("SELECT * FROM notifications WHERE audience = 'all' OR audience = $1 ORDER BY created_at DESC", [request.auth.id]);
@@ -86,9 +101,11 @@ app.get("/api/admin/users", requireAuth, requireAdmin, async (_request, response
   const result = await pool.query("SELECT id, username, email, role, plan, plan_expires_at AS \"expiresAt\", created_at AS \"createdAt\" FROM users ORDER BY created_at DESC");
   response.json(result.rows);
 });
+app.patch("/api/admin/users/:id/entitlement", requireAuth, requireAdmin, async (request, response) => { const result = await pool.query("UPDATE users SET plan = $1, plan_expires_at = $2, updated_at = NOW() WHERE id = $3 RETURNING id, plan, plan_expires_at AS \"expiresAt\"", [request.body.plan, request.body.expiresAt || null, request.params.id]); if (!result.rows[0]) return response.status(404).json({ error: "USER_NOT_FOUND" }); response.json(result.rows[0]); });
 
 app.get("/api/payment-methods", requireAuth, async (_request, response) => response.json((await pool.query("SELECT id, bank_name AS \"bankName\", card_number AS \"cardNumber\", holder_name AS \"holderName\", price_label AS price FROM payment_methods WHERE active = true ORDER BY created_at DESC")).rows));
 app.post("/api/admin/payment-methods", requireAuth, requireAdmin, async (request, response) => { const { bankName, cardNumber, holderName, price } = request.body; const result = await pool.query("INSERT INTO payment_methods (bank_name,card_number,holder_name,price_label) VALUES ($1,$2,$3,$4) RETURNING *", [bankName, cardNumber, holderName || "", price || null]); response.status(201).json(result.rows[0]); });
+app.delete("/api/admin/payment-methods/:id", requireAuth, requireAdmin, async (request, response) => { await pool.query("DELETE FROM payment_methods WHERE id = $1", [request.params.id]); response.status(204).end(); });
 
 app.use((_request, response) => response.status(404).json({ error: "NOT_FOUND" }));
 app.listen(process.env.PORT || 5000, () => console.log(`Moliyam API listening on ${process.env.PORT || 5000}`));

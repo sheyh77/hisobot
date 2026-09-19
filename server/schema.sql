@@ -8,9 +8,17 @@ CREATE TABLE IF NOT EXISTS users (
   role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'admin')),
   plan TEXT NOT NULL DEFAULT 'free' CHECK (plan IN ('free', 'pro')),
   plan_expires_at TIMESTAMPTZ,
+  phone TEXT,
+  address TEXT,
+  avatar TEXT,
+  notification_settings JSONB NOT NULL DEFAULT '{}'::jsonb,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+ALTER TABLE users ADD COLUMN IF NOT EXISTS phone TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS address TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS notification_settings JSONB NOT NULL DEFAULT '{}'::jsonb;
 
 CREATE TABLE IF NOT EXISTS device_tokens (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -31,6 +39,13 @@ CREATE TABLE IF NOT EXISTS transactions (
   status TEXT NOT NULL DEFAULT 'completed' CHECK (status IN ('planned', 'completed')),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   spent_at TIMESTAMPTZ
+);
+
+CREATE TABLE IF NOT EXISTS categories (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT UNIQUE NOT NULL,
+  color TEXT NOT NULL DEFAULT '#159a78',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS notifications (
