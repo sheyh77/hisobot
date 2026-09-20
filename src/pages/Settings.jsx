@@ -4,6 +4,7 @@ import { UserOutlined, UploadOutlined, LogoutOutlined } from "@ant-design/icons"
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import { requestReminderPermission } from "../utils/reminders";
+import { useLanguage } from "../context/LanguageContext";
 
 function Settings() {
   const { user, updateUser, logout } = useAuth();
@@ -12,6 +13,7 @@ function Settings() {
   const [remindersEnabled, setRemindersEnabled] = useState(false);
   const [form] = Form.useForm();
   const navigate = useNavigate(); // 🔹 navigate qo‘shildi
+  const { language, changeLanguage, t } = useLanguage();
 
   // Refreshdan keyin avatarni olish
   useEffect(() => {
@@ -87,6 +89,8 @@ function Settings() {
         <div className="settings-notice"><div><strong>Eslatmalar</strong><span>Rejalashtirilgan xarajatlar haqida xabar oling</span></div><button type="button" className={remindersEnabled ? "notice-switch on" : "notice-switch"} onClick={enableReminders}><i /></button></div>
         <Link to="/pro" className="settings-pro-link"><span><strong>Moliyam Pro</strong><small>Ko'proq nazorat va aqlli tahlil</small></span><b>Ko'rish →</b></Link>
 
+        <div className="settings-language"><label htmlFor="language-select">{t("language")}</label><select id="language-select" value={language} onChange={(event) => changeLanguage(event.target.value)}><option value="uz">O'zbekcha</option><option value="ru">Русский</option><option value="en">English</option></select></div>
+
         <Form className="settings-form" layout="vertical" form={form} onFinish={onFinish}>
           <Form.Item
             label="👤 Ism"
@@ -122,7 +126,7 @@ function Settings() {
                 background: "linear-gradient(135deg, #4f46e5, #3b82f6)",
               }}
             >
-              💾 Saqlash
+              💾 {t("save")}
             </Button>
           </Form.Item>
         </Form>

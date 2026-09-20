@@ -42,7 +42,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/admin" element={<AdminRoute><HeaderShell><Admin /></HeaderShell></AdminRoute>} />
         <Route path="/admin/tolovlar" element={<AdminRoute><HeaderShell><AdminPayments /></HeaderShell></AdminRoute>} />
-        <Route path="/pro" element={<PrivateRoute><Pro /></PrivateRoute>} />
+        <Route path="/pro" element={<PrivateRoute><HeaderShell><Pro /></HeaderShell></PrivateRoute>} />
         <Route path="/pro/tolov" element={<PrivateRoute><HeaderShell><ProPayment /></HeaderShell></PrivateRoute>} />
         <Route path="/bildirishnomalar" element={<PrivateRoute><HeaderShell><Notifications /></HeaderShell></PrivateRoute>} />
 

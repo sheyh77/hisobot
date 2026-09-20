@@ -2,10 +2,12 @@ import React from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { HomeOutlined, SwapOutlined, BarChartOutlined, SettingOutlined, CrownOutlined, BellOutlined } from "@ant-design/icons";
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
 
 function Header() {
   const location = useLocation();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const isAdmin = user?.role === "admin" || user?.isAdmin === true;
 
   const isActive = (path) => {
@@ -18,12 +20,12 @@ function Header() {
         <div className="header-wrap">
           <Link to="/" className="header-logo">Moliyam</Link>
           <div className="header-left-menu">
-            <Link to="/" className="header-left-menu-title">Asosiy</Link>
-            <Link to="/kirim-chiqim" className="header-left-menu-title">Kirim-chiqim</Link>
-            <Link to="/hisobot" className="header-left-menu-title">Hisobot</Link>
-            <Link to="/sozlamalar" className="header-left-menu-title">Sozlamalar</Link>
-            <Link to="/bildirishnomalar" className="header-left-menu-title"><BellOutlined /> Xabarlar</Link>
-            {isAdmin && <Link to="/admin" className="header-left-menu-title header-admin-link"><CrownOutlined /> Admin</Link>}
+            <Link to="/" className="header-left-menu-title">{t("home")}</Link>
+            <Link to="/kirim-chiqim" className="header-left-menu-title">{t("transactions")}</Link>
+            <Link to="/hisobot" className="header-left-menu-title">{t("reports")}</Link>
+            <Link to="/sozlamalar" className="header-left-menu-title">{t("settings")}</Link>
+            <Link to="/bildirishnomalar" className="header-left-menu-title"><BellOutlined /> {t("notifications")}</Link>
+            {isAdmin && <Link to="/admin" className="header-left-menu-title header-admin-link"><CrownOutlined /> {t("admin")}</Link>}
           </div>
 
           {/* responsive */}
