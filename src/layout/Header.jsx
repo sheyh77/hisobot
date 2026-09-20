@@ -4,7 +4,7 @@ import { HomeOutlined, SwapOutlined, BarChartOutlined, SettingOutlined, CrownOut
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 
-function Header() {
+function Header({ standalone = false }) {
   const location = useLocation();
   const { user } = useAuth();
   const { t } = useLanguage();
@@ -15,7 +15,7 @@ function Header() {
   };
 
   return (
-    <header className="header">
+    <header className={`header ${standalone ? "standalone-header" : ""}`}>
       <div className="cantainer">
         <div className="header-wrap">
           <Link to="/" className="header-logo">Moliyam</Link>

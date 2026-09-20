@@ -12,10 +12,12 @@ import { ArrowDownOutlined, ArrowUpOutlined, PlusOutlined, WalletOutlined } from
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getUserTransactions } from "../services/firestore";
+import { useLanguage } from "../context/LanguageContext";
 
 function Dashboard() {
   const [transactions, setTransactions] = useState([]);
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -72,7 +74,7 @@ function Dashboard() {
         <div className="dashboard-wrap">
           <div className="dashboard-intro">
             <div><p className="eyebrow">Moliyaviy nazorat markazi</p><h1 className="dashboard-title">Salom, {user?.username}!</h1><p className="dashboard-subtitle">Bugungi qarorlaringiz ertangi xotirjamlikni yaratadi.</p></div>
-            <Link to="/kirim-chiqim" className="primary-action"><PlusOutlined /> Tranzaksiya qo'shish</Link>
+            <Link to="/kirim-chiqim" className="primary-action"><PlusOutlined /> {t("add")}</Link>
           </div>
           <div className="dashboard-cards">
             <div className="dashboard-cards-balance">
@@ -100,7 +102,7 @@ function Dashboard() {
           </div>
 
           <div className="dashboard-transactions dashboard-panel">
-            <div className="panel-heading"><div><p className="eyebrow">Faoliyat</p><h2>Bugungi tranzaksiyalar</h2></div><Link to="/hisobot" className="text-link">Barchasini ko'rish <span>→</span></Link></div>
+            <div className="panel-heading"><div><p className="eyebrow">{t("activity")}</p><h2>{t("today")}</h2></div><Link to="/hisobot" className="text-link">{t("all")} <span>→</span></Link></div>
             {error && <div className="empty-state error-state">{error}</div>}
             {!loading && !error && todayTrans.length === 0 && <div className="empty-state">Bugun hali tranzaksiya yo'q. Birinchi yozuvingizni qo'shing.</div>}
             <div className="dashboard-transactions-list">

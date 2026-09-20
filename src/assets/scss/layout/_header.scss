@@ -96,3 +96,5 @@
     .header-menu-nav-block { font-size: 10px; gap: 3px; white-space: nowrap; }
     .header-menu-nav-block svg { font-size: 18px; }
 }
+
+.header.standalone-header { min-height: auto; padding-bottom: 0; gap: 0; }

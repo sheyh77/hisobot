@@ -32,7 +32,7 @@ const AdminRoute = ({ children }) => {
   return user.role === "admin" || user.isAdmin === true ? children : <Navigate to="/?admin=denied" replace />;
 };
 
-const HeaderShell = ({ children }) => <><Header />{children}</>;
+const HeaderShell = ({ children }) => <><Header standalone />{children}</>;
 
 function App() {
   return (

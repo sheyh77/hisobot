@@ -6,7 +6,7 @@ import { createPaymentRequest, getPaymentMethods, uploadPaymentReceipt } from ".
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 
-const features = ["Advanced analytics", "Budgets and financial goals", "AI financial assistant", "Smart notifications", "Debt and recurring transactions", "Professional reports", "Family finance", "Financial health score"];
+const features = ["Kengaytirilgan tahlil", "Budjetlar va moliyaviy maqsadlar", "AI moliyaviy yordamchi", "Aqlli bildirishnomalar", "Qarzlar va takroriy tranzaksiyalar", "Professional hisobotlar", "Oilaviy moliya", "Moliyaviy salomatlik ko'rsatkichi"];
 
 const Pro = () => {
   const { isPro, status, expiresAt } = useSubscription();
