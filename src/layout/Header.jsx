@@ -37,7 +37,7 @@ function Header({ standalone = false }) {
             </Link>
 
             <Link to="/kirim-chiqim">
-              <div className={`header-menu-nav-block ${isActive("/kirim-chiqim")}`}>
+              <div className={`header-menu-nav-block nav-primary-action ${isActive("/kirim-chiqim")}`}>
                 <SwapOutlined />
                 <p className="header-menu-nav-title">{t("transactions")}</p>
               </div>

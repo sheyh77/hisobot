@@ -89,10 +89,11 @@ function Settings() {
   return (
     <div className="settings-page">
       <Card className="settings-card" styles={{ body: { padding: 0 } }}>
-        <div className="settings-cover"><span>{t("profile")}</span></div>
+        <div className="settings-cover"><span>{t("profile")}</span><i>✦</i></div>
         <div className="settings-profile-head">
           <Avatar size={100} icon={<UserOutlined />} src={avatar} className="settings-avatar" />
           <div>
+            <span className="profile-status">● {t("activeStatus")}</span>
             <h1>{user?.name || user?.username || t("userProfileTitle")}</h1>
             <p>{user?.email || t("profileSummary")}</p>
             <Upload showUploadList={false} beforeUpload={handleUpload}>
@@ -103,6 +104,7 @@ function Settings() {
         </div>
 
         <div className="profile-summary-panel">
+          <div className="profile-summary-intro"><span className="profile-summary-icon">⌁</span><div><strong>{t("profileSummaryTitle")}</strong><small>{t("profileSummaryHint")}</small></div></div>
           <div className="profile-summary-grid">
             <div><span>{t("profileName")}</span><strong>{user?.name || "-"}</strong></div>
             <div><span>{t("profilePhone")}</span><strong>{user?.phone || "-"}</strong></div>

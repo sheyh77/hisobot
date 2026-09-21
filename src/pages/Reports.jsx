@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, message } from "antd";
 import { ArrowDownOutlined, ArrowUpOutlined, DownloadOutlined, SearchOutlined } from "@ant-design/icons";
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import jsPDF from "jspdf";
 import { useAuth } from "../context/AuthContext";
 import { cancelExpenseReminders } from "../utils/reminders";
@@ -37,12 +36,11 @@ const Reports = () => {
   const totalChiqim = filtered.filter((item) => item.type === "chiqim").reduce((sum, item) => sum + Number(item.amount || 0), 0);
   const plannedCount = filtered.filter((transaction) => transaction.status === "planned").length;
 
-  const chartData = [
-    { name: t("income"), value: totalKirim },
-    { name: t("expense"), value: totalChiqim },
-  ];
-
-  const COLORS = ["#52c41a", "#ff4d4f"];
+  const totalFlow = totalKirim + totalChiqim;
+  const incomeShare = totalFlow ? Math.round((totalKirim / totalFlow) * 100) : 0;
+  const expenseShare = totalFlow ? 100 - incomeShare : 0;
+  const categoryTotals = filtered.filter((item) => item.type === "chiqim").reduce((totals, item) => ({ ...totals, [item.category || t("generalCategory")]: (totals[item.category || t("generalCategory")] || 0) + Number(item.amount || 0) }), {});
+  const categoryRows = Object.entries(categoryTotals).sort(([, first], [, second]) => second - first).slice(0, 5);
 
   const exportCSV = () => {
     const csvContent =
@@ -145,23 +143,19 @@ const Reports = () => {
             </div>
           </div>
 
-          <div className="report-chart-panel">
-            <div className="report-chart-title">
-              <div><p className="eyebrow">{t("relationship")}</p><h2>{t("incomeAndExpense")}</h2></div>
-              <span>{totalKirim + totalChiqim ? Math.round((totalChiqim / (totalKirim + totalChiqim)) * 100) : 0}% {t("expenseRate")}</span>
+          <div className="report-insights-grid">
+            <div className="report-chart-panel report-flow-panel">
+              <div className="report-chart-title">
+                <div><p className="eyebrow">{t("relationship")}</p><h2>{t("incomeAndExpense")}</h2></div>
+                <span>{expenseShare}% {t("expenseRate")}</span>
+              </div>
+              <div className="report-flow-bar"><i style={{ width: `${incomeShare}%` }} /><b style={{ width: `${expenseShare}%` }} /></div>
+              <div className="report-flow-legend"><span><i className="income-dot" />{t("income")} <strong>{incomeShare}%</strong></span><span><i className="expense-dot" />{t("expense")} <strong>{expenseShare}%</strong></span></div>
+              <div className="report-flow-totals"><div><small>{t("totalIncome")}</small><strong>{totalKirim.toLocaleString("uz-UZ")} {t("monthlyCurrency")}</strong></div><div><small>{t("totalExpense")}</small><strong>{totalChiqim.toLocaleString("uz-UZ")} {t("monthlyCurrency")}</strong></div></div>
             </div>
-            <div style={{ width: "100%", height: 245 }}>
-              <ResponsiveContainer>
-                <PieChart>
-                  <Pie data={chartData} dataKey="value" nameKey="name" outerRadius={100} label>
-                    {chartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
+            <div className="report-chart-panel report-category-panel">
+              <div className="report-chart-title"><div><p className="eyebrow">{t("categoryBreakdown")}</p><h2>{t("topFive")}</h2></div></div>
+              {categoryRows.length ? categoryRows.map(([category, value]) => <div className="report-category-row" key={category}><div><span>{category}</span><b>{value.toLocaleString("uz-UZ")} {t("monthlyCurrency")}</b></div><i><em style={{ width: `${totalChiqim ? Math.min(100, (value / totalChiqim) * 100) : 0}%` }} /></i></div>) : <p className="report-category-empty">{t("noCategoryData")}</p>}
             </div>
           </div>
         </div>

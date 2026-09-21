@@ -1,0 +1,149 @@
+@keyframes page-reveal {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes soft-rise {
+  from { opacity: 0; transform: translateY(12px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes shimmer-line {
+  from { transform: translateX(-120%); }
+  to { transform: translateX(120%); }
+}
+
+.dashboard,
+.hisobot,
+.output,
+.settings-page,
+.pro-page,
+.notifications-page,
+.payment-page,
+.admin-page,
+.admin-payments-page {
+  animation: page-reveal .55s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.dashboard-cards > *,
+.dashboard-grid > *,
+.dashboard-transactions,
+.transaction-card,
+.report-summary,
+.report-toolbar,
+.report-chart-panel,
+.pro-card,
+.pro-features,
+.pro-workspace,
+.notifications-header,
+.user-notification,
+.admin-surface,
+.admin-stat,
+.settings-notice,
+.settings-pro-link,
+.settings-language,
+.profile-summary-panel,
+.app-pin-settings {
+  animation: soft-rise .55s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.dashboard-cards > *:nth-child(2),
+.dashboard-grid > *:nth-child(2),
+.report-summary:nth-child(2),
+.user-notification:nth-child(2),
+.admin-stat:nth-child(2) { animation-delay: .07s; }
+
+.dashboard-cards > *:nth-child(3),
+.report-summary:nth-child(3),
+.user-notification:nth-child(3),
+.admin-stat:nth-child(3) { animation-delay: .14s; }
+
+.dashboard-grid > *:nth-child(2),
+.user-notification:nth-child(4),
+.admin-stat:nth-child(4) { animation-delay: .21s; }
+
+.dashboard-cards-balance,
+.dashboard-cards-income,
+.dashboard-cards-output,
+.dashboard-panel,
+.report-summary,
+.report-chart-panel,
+.pro-card,
+.pro-workspace,
+.admin-surface,
+.settings-notice,
+.profile-summary-panel,
+.app-pin-settings {
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+
+.dashboard-cards-balance:hover,
+.dashboard-cards-income:hover,
+.dashboard-cards-output:hover,
+.dashboard-panel:hover,
+.report-summary:hover,
+.report-chart-panel:hover,
+.pro-card:hover,
+.pro-workspace:hover,
+.admin-surface:hover,
+.settings-notice:hover,
+.profile-summary-panel:hover,
+.app-pin-settings:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 34px rgba(33, 70, 61, .1);
+}
+
+.primary-action,
+.pro-button,
+.profile-edit-button,
+.profile-modal-save,
+.app-pin-settings .ant-btn-primary,
+.admin-primary,
+.output-save-button {
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+
+.primary-action:hover,
+.pro-button:hover:not(:disabled),
+.profile-edit-button:hover,
+.profile-modal-save:hover,
+.app-pin-settings .ant-btn-primary:hover,
+.admin-primary:hover,
+.output-save-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: saturate(1.08);
+  box-shadow: 0 10px 22px rgba(21, 154, 120, .24);
+}
+
+.primary-action:active,
+.pro-button:active:not(:disabled),
+.profile-edit-button:active,
+.profile-modal-save:active,
+.admin-primary:active,
+.output-save-button:active:not(:disabled) {
+  transform: translateY(0) scale(.98);
+}
+
+.pro-hero {
+  animation: page-reveal .7s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.pro-hero::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 35%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .12), transparent);
+  content: "";
+  animation: shimmer-line 4.5s ease-in-out 1s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}
