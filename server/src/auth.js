@@ -1,10 +1,20 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { pool } from "./db.js";
+import { rateLimit } from "express-rate-limit";
 
 dotenv.config();
 
 export const signUser = (user) => jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "30d" });
+
+export const authRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: Number(process.env.AUTH_RATE_LIMIT || 20),
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { error: "TOO_MANY_AUTH_ATTEMPTS" },
+  skipSuccessfulRequests: true,
+});
 
 export const requireAuth = (request, response, next) => {
   const token = request.headers.authorization?.replace("Bearer ", "");

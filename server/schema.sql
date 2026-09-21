@@ -82,3 +82,6 @@ CREATE TABLE IF NOT EXISTS payment_requests (
 CREATE INDEX IF NOT EXISTS transactions_user_created_idx ON transactions(user_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS notifications_audience_created_idx ON notifications(audience, created_at DESC);
 CREATE INDEX IF NOT EXISTS payment_requests_user_idx ON payment_requests(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS users_created_idx ON users(created_at DESC);
+CREATE INDEX IF NOT EXISTS users_role_created_idx ON users(role, created_at DESC);
+CREATE INDEX IF NOT EXISTS payment_methods_active_created_idx ON payment_methods(active, created_at DESC);
