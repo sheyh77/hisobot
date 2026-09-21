@@ -28,39 +28,42 @@ function Header({ standalone = false }) {
             {isAdmin && <Link to="/admin" className="header-left-menu-title header-admin-link"><CrownOutlined /> {t("admin")}</Link>}
           </div>
 
-          {/* responsive */}
           <div className="header-menu-nav">
             <Link to="/">
               <div className={`header-menu-nav-block ${isActive("/")}`}>
                 <HomeOutlined />
-                <p className="header-menu-nav-title">Asosiy</p>
+                <p className="header-menu-nav-title">{t("home")}</p>
               </div>
             </Link>
 
             <Link to="/kirim-chiqim">
               <div className={`header-menu-nav-block ${isActive("/kirim-chiqim")}`}>
                 <SwapOutlined />
-                <p className="header-menu-nav-title">Kirim-chiqim</p>
+                <p className="header-menu-nav-title">{t("transactions")}</p>
               </div>
             </Link>
 
             <Link to="/hisobot">
               <div className={`header-menu-nav-block ${isActive("/hisobot")}`}>
                 <BarChartOutlined />
-                <p className="header-menu-nav-title">Hisobot</p>
+                <p className="header-menu-nav-title">{t("reports")}</p>
               </div>
             </Link>
 
             <Link to="/sozlamalar">
               <div className={`header-menu-nav-block ${isActive("/sozlamalar")}`}>
                 <SettingOutlined />
-                <p className="header-menu-nav-title">Sozlamalar</p>
+                <p className="header-menu-nav-title">{t("settings")}</p>
               </div>
             </Link>
-            <Link to="/bildirishnomalar"><div className={`header-menu-nav-block ${isActive("/bildirishnomalar")}`}><BellOutlined /><p className="header-menu-nav-title">Xabarlar</p></div></Link>
-            {isAdmin && <Link to="/admin"><div className={`header-menu-nav-block ${isActive("/admin")}`}><CrownOutlined /><p className="header-menu-nav-title">Admin</p></div></Link>}
+            <Link to="/bildirishnomalar">
+              <div className={`header-menu-nav-block ${isActive("/bildirishnomalar")}`}>
+                <BellOutlined />
+                <p className="header-menu-nav-title">{t("notifications")}</p>
+              </div>
+            </Link>
+            {isAdmin && <Link to="/admin"><div className={`header-menu-nav-block ${isActive("/admin")}`}><CrownOutlined /><p className="header-menu-nav-title">{t("admin")}</p></div></Link>}
           </div>
-
         </div>
       </div>
       <Outlet />

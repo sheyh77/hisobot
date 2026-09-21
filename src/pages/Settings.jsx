@@ -1,26 +1,31 @@
 import React, { useState, useEffect } from "react";
-import { Form, Input, Button, Upload, Avatar, Card, message } from "antd";
+import { Form, Input, Button, Upload, Avatar, Card, Modal, message } from "antd";
 import { UserOutlined, UploadOutlined, LogoutOutlined } from "@ant-design/icons";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import { requestReminderPermission } from "../utils/reminders";
 import { useLanguage } from "../context/LanguageContext";
+import { getPinHash, removePin, savePin } from "../utils/appLock";
 
 function Settings() {
   const { user, updateUser, logout } = useAuth();
   const [loading, setLoading] = useState(false);
   const [avatar, setAvatar] = useState(null);
   const [remindersEnabled, setRemindersEnabled] = useState(false);
+  const [appPin, setAppPin] = useState("");
+  const [appPinConfirm, setAppPinConfirm] = useState("");
+  const [hasAppPin, setHasAppPin] = useState(false);
+  const [editProfileOpen, setEditProfileOpen] = useState(false);
   const [form] = Form.useForm();
-  const navigate = useNavigate(); // 🔹 navigate qo‘shildi
+  const navigate = useNavigate();
   const { language, changeLanguage, t } = useLanguage();
 
-  // Refreshdan keyin avatarni olish
   useEffect(() => {
     const savedAvatar = localStorage.getItem("avatar");
     if (savedAvatar) setAvatar(savedAvatar);
 
     if (user) {
+      setHasAppPin(Boolean(getPinHash(user.id)));
       form.setFieldsValue({
         name: user.name || "",
         phone: user.phone || "",
@@ -36,14 +41,15 @@ function Settings() {
 
     updateUser(formData);
 
-    message.success("Ma'lumotlar yangilandi");
+    message.success(t("save"));
     setLoading(false);
+    setEditProfileOpen(false);
   };
 
   const enableReminders = async () => {
     const granted = await requestReminderPermission();
     setRemindersEnabled(granted);
-    message[granted ? "success" : "warning"](granted ? "Eslatmalar yoqildi" : "Bildirishnomaga ruxsat berilmadi");
+    message[granted ? "success" : "warning"](granted ? t("enableReminders") : t("reminderPermissionDenied"));
   };
 
   const handleUpload = (file) => {
@@ -57,80 +63,96 @@ function Settings() {
   };
 
   const handleLogout = () => {
-    logout();           // 🔹 userni tozalaydi
-    navigate("/login"); // 🔹 login sahifaga qaytaradi
+    logout();
+    navigate("/login");
+  };
+
+  const handlePinSave = async (event) => {
+    event.preventDefault();
+    if (appPin.length !== 4 || appPin !== appPinConfirm) {
+      message.warning(t("appLockPinMismatch"));
+      return;
+    }
+    await savePin(user.id, appPin);
+    setHasAppPin(true);
+    setAppPin("");
+    setAppPinConfirm("");
+    message.success(t("appLockPinSaved"));
+  };
+
+  const handlePinRemove = () => {
+    removePin(user.id);
+    setHasAppPin(false);
+    message.success(t("appLockPinRemoved"));
   };
 
   return (
     <div className="settings-page">
-      <Card
-        className="settings-card"
-        styles={{ body: { padding: 0 } }}
-      >
-        <div className="settings-cover"><span>PROFIL</span></div>
+      <Card className="settings-card" styles={{ body: { padding: 0 } }}>
+        <div className="settings-cover"><span>{t("profile")}</span></div>
         <div className="settings-profile-head">
-          <Avatar
-            size={100}
-            icon={<UserOutlined />}
-            src={avatar}
-            className="settings-avatar"
-          />
-          <div><h1>{user?.name || user?.username || "Profil"}</h1><p>{user?.email || "Shaxsiy moliya boshqaruvi"}</p><Upload showUploadList={false} beforeUpload={handleUpload}><Button icon={<UploadOutlined />}>Rasmni almashtirish</Button></Upload></div>
-          <Button
-            danger
-            icon={<LogoutOutlined />}
-            onClick={handleLogout}
-            className="settings-logout"
-          >
-            Chiqish
-          </Button>
+          <Avatar size={100} icon={<UserOutlined />} src={avatar} className="settings-avatar" />
+          <div>
+            <h1>{user?.name || user?.username || t("userProfileTitle")}</h1>
+            <p>{user?.email || t("profileSummary")}</p>
+            <Upload showUploadList={false} beforeUpload={handleUpload}>
+              <Button icon={<UploadOutlined />}>{t("changePhoto")}</Button>
+            </Upload>
+          </div>
+          <Button danger icon={<LogoutOutlined />} onClick={handleLogout} className="settings-logout">{t("logout")}</Button>
         </div>
 
-        <div className="settings-notice"><div><strong>Eslatmalar</strong><span>Rejalashtirilgan xarajatlar haqida xabar oling</span></div><button type="button" className={remindersEnabled ? "notice-switch on" : "notice-switch"} onClick={enableReminders}><i /></button></div>
-        <Link to="/pro" className="settings-pro-link"><span><strong>Moliyam Pro</strong><small>Ko'proq nazorat va aqlli tahlil</small></span><b>Ko'rish →</b></Link>
+        <div className="profile-summary-panel">
+          <div className="profile-summary-grid">
+            <div><span>{t("profileName")}</span><strong>{user?.name || "-"}</strong></div>
+            <div><span>{t("profilePhone")}</span><strong>{user?.phone || "-"}</strong></div>
+            <div><span>{t("profileAddress")}</span><strong>{user?.address || "-"}</strong></div>
+            <div><span>{t("profileEmail")}</span><strong>{user?.email || "-"}</strong></div>
+          </div>
+          <Button className="profile-edit-button" type="primary" onClick={() => setEditProfileOpen(true)}>{t("editProfile")}</Button>
+        </div>
 
-        <div className="settings-language"><label htmlFor="language-select">{t("language")}</label><select id="language-select" value={language} onChange={(event) => changeLanguage(event.target.value)}><option value="uz">O'zbekcha</option><option value="ru">Русский</option><option value="en">English</option></select></div>
+        <div className="settings-notice">
+          <div>
+            <strong>{t("reminders")}</strong>
+            <span>{t("remindersText")}</span>
+          </div>
+          <button type="button" className={remindersEnabled ? "notice-switch on" : "notice-switch"} onClick={enableReminders}><i /></button>
+        </div>
+        <Link to="/pro" className="settings-pro-link"><span><strong>{t("pro")}</strong><small>{t("proSmart")}</small></span><b>{t("targetBlank")}</b></Link>
 
-        <Form className="settings-form" layout="vertical" form={form} onFinish={onFinish}>
-          <Form.Item
-            label="👤 Ism"
-            name="name"
-            rules={[{ required: true, message: "Ismni kiriting" }]}
-          >
-            <Input placeholder="Ismingizni kiriting" />
-          </Form.Item>
+        <div className="app-pin-settings">
+          <div className="app-pin-heading"><span className="app-pin-badge">⌘</span><div><strong>{t("appLockSettingsTitle")}</strong><small>{hasAppPin ? t("appLockEnabled") : t("appLockDisabled")}</small></div></div>
+          <form onSubmit={handlePinSave}>
+            <Input.Password maxLength={4} inputMode="numeric" value={appPin} onChange={(event) => setAppPin(event.target.value.replace(/\D/g, "").slice(0, 4))} placeholder={t("appLockPinPlaceholder")} />
+            <Input.Password maxLength={4} inputMode="numeric" value={appPinConfirm} onChange={(event) => setAppPinConfirm(event.target.value.replace(/\D/g, "").slice(0, 4))} placeholder={t("appLockPinConfirmPlaceholder")} />
+            <Button type="primary" htmlType="submit">{t("appLockPinSave")}</Button>
+            {hasAppPin && <Button danger type="link" onClick={handlePinRemove}>{t("appLockPinRemove")}</Button>}
+          </form>
+        </div>
 
-          <Form.Item label="📱 Telefon" name="phone">
-            <Input placeholder="+998 90 123 45 67" />
-          </Form.Item>
+        <div className="settings-language">
+          <div className="settings-language-heading">
+            <span className="language-globe">文</span>
+            <div><strong>{t("language")}</strong><small>{t("chooseLanguage")}</small></div>
+          </div>
+          <div className="language-options" role="radiogroup" aria-label={t("language")}>
+            {[{ id: "uz", label: "O'zbekcha", mark: "UZ" }, { id: "ru", label: "Русский", mark: "RU" }, { id: "en", label: "English", mark: "EN" }].map((item) => (
+              <button type="button" role="radio" aria-checked={language === item.id} className={language === item.id ? "language-option selected" : "language-option"} key={item.id} onClick={() => changeLanguage(item.id)}><span>{item.mark}</span><b>{item.label}</b>{language === item.id && <i>✓</i>}</button>
+            ))}
+          </div>
+        </div>
 
-          <Form.Item label="🏠 Manzil" name="address">
-            <Input placeholder="Manzilingizni kiriting" />
-          </Form.Item>
-
-          <Form.Item label="📧 Email" name="email">
-            <Input placeholder="Emailingizni kiriting" />
-          </Form.Item>
-
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              style={{
-                width: "100%",
-                height: 45,
-                borderRadius: 12,
-                fontSize: 16,
-                fontWeight: 600,
-                background: "linear-gradient(135deg, #4f46e5, #3b82f6)",
-              }}
-            >
-              💾 {t("save")}
-            </Button>
-          </Form.Item>
-        </Form>
       </Card>
+      <Modal className="profile-edit-modal" open={editProfileOpen} onCancel={() => setEditProfileOpen(false)} footer={null} title={t("editProfile")} centered>
+        <Form className="settings-form" layout="vertical" form={form} onFinish={onFinish}>
+          <Form.Item label={`👤 ${t("profileName")}`} name="name" rules={[{ required: true, message: t("profilePlaceholder") }]}><Input placeholder={language === "en" ? "Enter your name" : language === "ru" ? "Введите имя" : "Ismingizni kiriting"} /></Form.Item>
+          <Form.Item label={`📱 ${t("profilePhone")}`} name="phone"><Input placeholder={t("phonePlaceholder")} /></Form.Item>
+          <Form.Item label={`🏠 ${t("profileAddress")}`} name="address"><Input placeholder={t("addressPlaceholder")} /></Form.Item>
+          <Form.Item label={`📧 ${t("profileEmail")}`} name="email"><Input placeholder={t("emailPlaceholder")} /></Form.Item>
+          <Button className="profile-modal-save" type="primary" htmlType="submit" loading={loading}>{t("save")}</Button>
+        </Form>
+      </Modal>
     </div>
   );
 }

@@ -1,0 +1,120 @@
+.profile-summary-panel {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 18px;
+  align-items: center;
+  margin: 0 28px 20px;
+  padding: 16px;
+  border: 1px solid #e1ebe6;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #fbfdfc, #f2f9f5);
+}
+
+.profile-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px 18px;
+}
+
+.profile-summary-grid div {
+  min-width: 0;
+}
+
+.profile-summary-grid span,
+.profile-summary-grid strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-summary-grid span {
+  margin-bottom: 4px;
+  color: #8a9a95;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.profile-summary-grid strong {
+  color: #19312d;
+  font-size: 12px;
+}
+
+.profile-edit-button {
+  min-width: 130px;
+  border: 0;
+  border-radius: 8px;
+  background: #159a78;
+  font-weight: 700;
+}
+
+.app-pin-settings {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+  align-items: center;
+  background: linear-gradient(135deg, #fffaf4, #f8fbf9);
+}
+
+.app-pin-heading {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 10px;
+}
+
+.app-pin-badge {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  place-items: center;
+  border-radius: 11px;
+  color: #a66b35;
+  background: #f6e9d9;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.app-pin-settings form {
+  align-items: center;
+}
+
+.profile-edit-modal .ant-modal-content {
+  border-radius: 16px;
+}
+
+.profile-edit-modal .settings-form {
+  padding: 8px 0 0;
+  border-top: 0;
+}
+
+.profile-modal-save {
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #159a78, #087d5e);
+  font-weight: 800;
+}
+
+@media (max-width: 650px) {
+  .profile-summary-panel {
+    grid-template-columns: 1fr;
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+
+  .profile-edit-button {
+    width: 100%;
+  }
+
+  .app-pin-settings {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .profile-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}

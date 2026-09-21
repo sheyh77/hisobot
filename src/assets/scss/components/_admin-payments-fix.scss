@@ -1,0 +1,124 @@
+.admin-payment-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.admin-payment-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px;
+  border: 1px solid #e2ebe7;
+  border-radius: 14px;
+  background: #fbfdfc;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.admin-payment-row:hover {
+  border-color: #9ed8c2;
+  box-shadow: 0 8px 22px rgba(25, 49, 45, 0.08);
+  transform: translateY(-1px);
+}
+
+.admin-payment-info {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.admin-payment-info strong {
+  color: #19312d;
+  font-size: 14px;
+}
+
+.admin-payment-info span,
+.admin-payment-info a {
+  color: #71847f;
+  font-size: 12px;
+}
+
+.admin-payment-info a {
+  width: fit-content;
+  color: #087d5e;
+  font-weight: 700;
+}
+
+.admin-payment-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.admin-payment-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 13px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font: 700 12px "Manrope", sans-serif;
+  cursor: pointer;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.admin-payment-actions button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.admin-payment-actions button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.admin-payment-approve {
+  color: #087d5e;
+  background: #e1f4ea;
+  border-color: #b7e4cd !important;
+}
+
+.admin-payment-reject {
+  color: #b94f42;
+  background: #fff0ed;
+  border-color: #f2c6bf !important;
+}
+
+.admin-payment-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 11px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.admin-payment-status.approved {
+  color: #087d5e;
+  background: #e1f4ea;
+}
+
+.admin-payment-status.rejected {
+  color: #b94f42;
+  background: #fff0ed;
+}
+
+@media (max-width: 650px) {
+  .admin-payment-row {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 13px;
+  }
+
+  .admin-payment-actions {
+    width: 100%;
+  }
+
+  .admin-payment-actions button {
+    flex: 1;
+  }
+}

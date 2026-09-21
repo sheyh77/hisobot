@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { pool } from "./db.js";
 
 dotenv.config();
 
@@ -16,4 +17,12 @@ export const requireAuth = (request, response, next) => {
   }
 };
 
-export const requireAdmin = (request, response, next) => request.auth?.role === "admin" ? next() : response.status(403).json({ error: "ADMIN_REQUIRED" });
+export const requireAdmin = async (request, response, next) => {
+  try {
+    const result = await pool.query("SELECT role FROM users WHERE id = $1", [request.auth?.id]);
+    if (result.rows[0]?.role !== "admin") return response.status(403).json({ error: "ADMIN_REQUIRED" });
+    return next();
+  } catch {
+    return response.status(500).json({ error: "ADMIN_CHECK_FAILED" });
+  }
+};

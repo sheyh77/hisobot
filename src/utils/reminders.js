@@ -3,6 +3,7 @@ import { LocalNotifications } from "@capacitor/local-notifications";
 
 const webTimers = new Map();
 const reminderKey = (transactionId) => `moliyam-reminders-${transactionId}`;
+const notificationChannelId = "moliyam-reminders";
 
 const parseLocalDate = (dateValue, hour, minute) => {
   const [year, month, day] = dateValue.split("-").map(Number);
@@ -29,8 +30,21 @@ const numericId = (value, index) => {
 
 const showWebNotification = (title, body) => {
   if (typeof Notification !== "undefined" && Notification.permission === "granted") {
-    new Notification(title, { body, icon: "/images/icon.png" });
+    new Notification(title, { body, icon: "/images/icon.png", silent: false, renotify: true, tag: notificationChannelId });
   }
+};
+
+const ensureAndroidNotificationChannel = async () => {
+  if (!Capacitor.isNativePlatform()) return;
+  await LocalNotifications.createChannel({
+    id: notificationChannelId,
+    name: "Moliyam eslatmalari",
+    description: "Rejalashtirilgan xarajatlar eslatmalari",
+    importance: 5,
+    sound: "default",
+    vibration: true,
+    lights: true,
+  });
 };
 
 export const requestReminderPermission = async () => {
@@ -43,6 +57,14 @@ export const requestReminderPermission = async () => {
   return permission === "granted";
 };
 
+export const getReminderPermission = async () => {
+  if (Capacitor.isNativePlatform()) {
+    const result = await LocalNotifications.checkPermissions();
+    return result.display;
+  }
+  return typeof Notification === "undefined" ? "denied" : Notification.permission;
+};
+
 export const scheduleExpenseReminders = async (transaction) => {
   if (!transaction?.dueDate || !transaction?.id || !transaction.reminderEnabled) return [];
   const dueDate = new Date(`${transaction.dueDate}T00:00:00`);
@@ -53,12 +75,15 @@ export const scheduleExpenseReminders = async (transaction) => {
   await requestReminderPermission();
 
   if (Capacitor.isNativePlatform()) {
+    await ensureAndroidNotificationChannel();
     const ids = validTimes.map((_, index) => numericId(transaction.id, index));
     await LocalNotifications.schedule({
       notifications: validTimes.map((date, index) => ({
         id: ids[index],
         title: date < dueDate ? "Ertangi rejangiz" : "Rejalashtirilgan xarajat",
         body: `${transaction.amount.toLocaleString("uz-UZ")} so'm - ${transaction.desc || "xarajatni amalga oshirish vaqti"}`,
+        channelId: notificationChannelId,
+        sound: "default",
         schedule: { at: date, allowWhileIdle: true },
         extra: { transactionId: transaction.id },
       })),

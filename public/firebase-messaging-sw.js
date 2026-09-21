@@ -17,6 +17,10 @@ messaging.onBackgroundMessage((payload) => {
   console.log("📩 Orqa fonda kelgan xabar:", payload);
   self.registration.showNotification(payload.notification.title, {
     body: payload.notification.body,
-    icon: "/logo192.png",
+    icon: "/images/apk_img.png",
+    silent: false,
+    renotify: true,
+    vibrate: [200, 100, 200],
+    tag: "moliyam-push",
   });
 });

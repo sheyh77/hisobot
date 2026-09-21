@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { api } from "../services/api";
+import { registerWebPushToken } from "../services/messaging";
 
 const AuthContext = createContext(null);
 const normalizeUser = (user) => ({ ...user, uid: user.id, expiresAt: user.expiresAt || user.expires_at });
@@ -10,7 +11,11 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     if (!localStorage.getItem("moliyam-api-token")) { setLoading(false); return; }
-    api.get("/api/me").then(({ user: profile }) => setUser(normalizeUser(profile))).catch(() => localStorage.removeItem("moliyam-api-token")).finally(() => setLoading(false));
+    api.get("/api/me").then(({ user: profile }) => {
+      const normalizedProfile = normalizeUser(profile);
+      setUser(normalizedProfile);
+      registerWebPushToken(normalizedProfile.id).catch(() => undefined);
+    }).catch(() => localStorage.removeItem("moliyam-api-token")).finally(() => setLoading(false));
   }, []);
 
   const register = async (username, email, password) => {
@@ -24,6 +29,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("moliyam-api-token", result.token);
     const nextUser = normalizeUser(result.user);
     setUser(nextUser);
+    registerWebPushToken(nextUser.id).catch(() => undefined);
     return nextUser;
   };
 

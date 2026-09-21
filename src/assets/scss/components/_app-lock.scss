@@ -1,0 +1,264 @@
+.app-lock-screen {
+  position: fixed;
+  z-index: 3000;
+  inset: 0;
+  display: grid;
+  overflow: auto;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(117, 213, 172, 0.3), transparent 28%),
+    radial-gradient(circle at 85% 85%, rgba(240, 174, 120, 0.25), transparent 30%),
+    linear-gradient(135deg, #eef5f1 0%, #f8fbf9 48%, #f8efe7 100%);
+}
+
+.app-lock-screen::before,
+.app-lock-screen::after {
+  position: fixed;
+  z-index: -1;
+  width: 280px;
+  height: 280px;
+  border: 1px solid rgba(21, 154, 120, 0.12);
+  border-radius: 50%;
+  content: "";
+}
+
+.app-lock-screen::before {
+  top: -150px;
+  left: -80px;
+  box-shadow: 0 0 0 28px rgba(21, 154, 120, 0.04), 0 0 0 56px rgba(21, 154, 120, 0.035);
+}
+
+.app-lock-screen::after {
+  right: -100px;
+  bottom: -170px;
+  border-color: rgba(240, 174, 120, 0.2);
+}
+
+.app-lock-shell {
+  width: min(100%, 390px);
+  padding: 34px 30px 28px;
+  border: 1px solid #dce9e3;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 24px 70px rgba(25, 49, 45, 0.14);
+  text-align: center;
+}
+
+.app-lock-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 25px;
+}
+
+.app-lock-brand > span {
+  width: 34px;
+  height: 7px;
+  margin-bottom: 2px;
+  border-radius: 10px;
+  background: #159a78;
+  box-shadow: 10px 0 #f0ae78;
+}
+
+.app-lock-brand strong {
+  color: #19312d;
+  font: 800 24px "Manrope", sans-serif;
+}
+
+.app-lock-brand small,
+.app-lock-footer {
+  color: #91a19d;
+  font-size: 10px;
+}
+
+.app-lock-icon {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 14px;
+  place-items: center;
+  border-radius: 16px;
+  color: #087d5e;
+  background: #e1f4ea;
+  font-size: 24px;
+}
+
+.app-lock-shell h1 {
+  margin: 0 0 8px;
+  color: #19312d;
+  font: 800 20px "Manrope", sans-serif;
+}
+
+.app-lock-shell p {
+  margin: 0;
+  color: #71847f;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.app-lock-attempts {
+  display: block;
+  margin-top: 8px;
+  color: #b94f42;
+  font-size: 11px;
+}
+
+.app-lock-shell form {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.app-lock-keyboard-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.app-lock-pin-display {
+  display: flex;
+  justify-content: center;
+  gap: 13px;
+  margin: 8px 0 18px;
+}
+
+.app-lock-pin-display span {
+  display: block;
+  width: 13px;
+  height: 13px;
+  border: 2px solid #bfd5cc;
+  border-radius: 50%;
+  background: transparent;
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.app-lock-pin-display span.filled {
+  border-color: #159a78;
+  background: #159a78;
+  transform: scale(1.08);
+}
+
+.app-lock-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  max-width: 292px;
+  margin: 0 auto;
+  padding: 4px 0 8px;
+}
+
+.app-lock-keypad button {
+  display: grid;
+  width: 68px;
+  height: 68px;
+  justify-self: center;
+  place-items: center;
+  border: 1px solid rgba(21, 154, 120, 0.14);
+  border-radius: 50%;
+  color: #19312d;
+  background: linear-gradient(145deg, #ffffff, #edf6f1);
+  box-shadow: 0 7px 14px rgba(25, 49, 45, 0.1), inset 0 1px 0 #ffffff;
+  font: 800 21px "Manrope", sans-serif;
+  cursor: pointer;
+  transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.app-lock-keypad button:hover:not(:disabled) {
+  border-color: #9ed8c2;
+  box-shadow: 0 10px 18px rgba(25, 49, 45, 0.14), inset 0 1px 0 #ffffff;
+  transform: translateY(-2px);
+}
+
+.app-lock-keypad button:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.app-lock-keypad button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.app-lock-keypad .empty-key {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.app-lock-keypad .delete-key {
+  color: #b94f42;
+  background: linear-gradient(145deg, #fffaf8, #ffece8);
+  font-size: 22px;
+}
+
+.app-lock-footer {
+  display: block;
+  margin-top: 22px;
+}
+
+.app-pin-settings {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 16px;
+  align-items: start;
+  margin: 0 28px 22px;
+  padding: 16px;
+  border: 1px solid #e3ece8;
+  border-radius: 10px;
+  background: #fbfdfc;
+}
+
+.app-pin-settings > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.app-pin-settings strong {
+  color: #19312d;
+  font-size: 13px;
+}
+
+.app-pin-settings small {
+  color: #71847f;
+  font-size: 11px;
+}
+
+.app-pin-settings form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.app-pin-settings form .ant-btn-primary {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 650px) {
+  .app-pin-settings {
+    grid-template-columns: 1fr;
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-lock-screen {
+    padding: 16px;
+  }
+
+  .app-lock-shell {
+    padding: 30px 22px 24px;
+  }
+
+  .app-lock-keypad {
+    gap: 10px;
+  }
+
+  .app-lock-keypad button {
+    width: 62px;
+    height: 62px;
+  }
+}

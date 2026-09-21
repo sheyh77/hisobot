@@ -1,0 +1,57 @@
+.notification-permission-modal .ant-modal-content {
+  max-width: 420px;
+  margin: 0 auto;
+  border-radius: 16px;
+}
+
+.notification-permission-content {
+  padding: 8px 4px 2px;
+  text-align: center;
+}
+
+.notification-permission-icon {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 14px;
+  place-items: center;
+  border-radius: 16px;
+  color: #087d5e;
+  background: #e1f4ea;
+  font-size: 25px;
+}
+
+.notification-permission-content h2 {
+  margin: 0 0 8px;
+  color: #19312d;
+  font: 800 20px "Manrope", sans-serif;
+}
+
+.notification-permission-content p {
+  margin: 0 auto;
+  max-width: 330px;
+  color: #71847f;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.notification-permission-actions {
+  display: flex;
+  justify-content: center;
+  gap: 9px;
+  margin-top: 20px;
+}
+
+@media (max-width: 480px) {
+  .notification-permission-modal {
+    margin: 0 10px;
+  }
+
+  .notification-permission-actions {
+    flex-direction: column-reverse;
+  }
+
+  .notification-permission-actions button {
+    width: 100%;
+  }
+}
