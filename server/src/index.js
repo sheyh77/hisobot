@@ -17,7 +17,12 @@ if (process.env.NODE_ENV === "production" && (!process.env.JWT_SECRET || process
 const app = express();
 app.disable("x-powered-by");
 app.set("trust proxy", 1);
-const fcmReady = Boolean(process.env.FCM_CLIENT_EMAIL && process.env.FCM_PRIVATE_KEY && process.env.FCM_PROJECT_ID);
+const fcmReady = Boolean(
+  process.env.FCM_CLIENT_EMAIL?.includes("@") &&
+  process.env.FCM_PRIVATE_KEY?.includes("BEGIN PRIVATE KEY") &&
+  process.env.FCM_PROJECT_ID?.trim(),
+);
+if (process.env.NODE_ENV === "production" && !fcmReady) throw new Error("FCM_CLIENT_EMAIL, FCM_PRIVATE_KEY, and FCM_PROJECT_ID are required in production");
 if (fcmReady && !admin.apps.length) admin.initializeApp({ credential: admin.credential.cert({ projectId: process.env.FCM_PROJECT_ID, clientEmail: process.env.FCM_CLIENT_EMAIL, privateKey: process.env.FCM_PRIVATE_KEY.replace(/\\n/g, "\n") }) });
 const allowedOrigins = (process.env.CORS_ORIGIN || "")
   .split(",")
@@ -60,7 +65,7 @@ app.use(express.urlencoded({ extended: false, limit: "32kb" }));
 
 const userShape = (row) => ({ id: row.id, username: row.username, email: row.email, role: row.role, plan: row.plan, expiresAt: row.plan_expires_at });
 
-app.get("/health", (_request, response) => response.json({ ok: true, service: "moliyam-api" }));
+app.get("/health", (_request, response) => response.json({ ok: true, service: "moliyam-api", fcmReady }));
 
 app.post("/api/auth/register", authRateLimit, async (request, response) => {
   const { username, email, password } = request.body;
@@ -125,7 +130,8 @@ app.delete("/api/admin/categories/:id", requireAuth, requireAdmin, async (reques
 
 app.post("/api/device-tokens", requireAuth, async (request, response) => {
   if (typeof request.body.token !== "string" || request.body.token.length < 10 || request.body.token.length > 4096) return response.status(400).json({ error: "INVALID_DEVICE_TOKEN" });
-  await pool.query("INSERT INTO device_tokens (user_id, token, platform) VALUES ($1,$2,$3) ON CONFLICT (token) DO UPDATE SET user_id = EXCLUDED.user_id", [request.auth.id, request.body.token, request.body.platform || "android"]);
+  const platform = ["android", "ios", "web"].includes(request.body.platform) ? request.body.platform : "android";
+  await pool.query("INSERT INTO device_tokens (user_id, token, platform) VALUES ($1,$2,$3) ON CONFLICT (token) DO UPDATE SET user_id = EXCLUDED.user_id, platform = EXCLUDED.platform", [request.auth.id, request.body.token, platform]);
   response.status(204).end();
 });
 
@@ -143,13 +149,39 @@ app.get("/api/notifications", requireAuth, async (request, response) => {
 app.post("/api/admin/notifications", requireAuth, requireAdmin, async (request, response) => {
   const { title, body, audience = "all" } = request.body;
   if (typeof title !== "string" || !title.trim() || title.length > 160 || typeof body !== "string" || !body.trim() || body.length > 2000 || (audience !== "all" && typeof audience !== "string")) return response.status(400).json({ error: "INVALID_NOTIFICATION" });
-  const result = await pool.query("INSERT INTO notifications (audience,title,body) VALUES ($1,$2,$3) RETURNING *", [audience, title, body]);
+  const notificationResult = await pool.query("INSERT INTO notifications (audience,title,body) VALUES ($1,$2,$3) RETURNING *", [audience, title, body]);
   if (fcmReady) {
     const tokenQuery = audience === "all" ? "SELECT token FROM device_tokens" : "SELECT token FROM device_tokens WHERE user_id = $1";
     const tokens = (await pool.query(tokenQuery, audience === "all" ? [] : [audience])).rows.map((row) => row.token);
-    if (tokens.length) await admin.messaging().sendEachForMulticast({ tokens, notification: { title, body } });
+    if (tokens.length) {
+      const fcmResult = await admin.messaging().sendEachForMulticast({
+        tokens,
+        notification: { title: title.trim(), body: body.trim() },
+        android: {
+          priority: "high",
+          notification: {
+            sound: "default",
+            channelId: "moliyam-reminders",
+            clickAction: "FCM_PLUGIN_ACTIVITY",
+          },
+        },
+        apns: {
+          headers: { "apns-priority": "10" },
+          payload: { aps: { sound: "default", alert: { title: title.trim(), body: body.trim() } } },
+        },
+        webpush: {
+          headers: { Urgency: "high", TTL: "86400" },
+          notification: { icon: "/images/apk_img.png", requireInteraction: false },
+        },
+      });
+      const invalidTokens = fcmResult.responses
+        .map((item, index) => item.success ? null : ["messaging/registration-token-not-registered", "messaging/invalid-registration-token"].includes(item.error?.code) ? tokens[index] : null)
+        .filter(Boolean);
+      if (invalidTokens.length) await pool.query("DELETE FROM device_tokens WHERE token = ANY($1::text[])", [invalidTokens]);
+      await pool.query("UPDATE notifications SET status = 'sent', sent_count = $1, sent_at = NOW() WHERE id = $2", [fcmResult.successCount, notificationResult.rows[0].id]);
+    }
   }
-  response.status(201).json(result.rows[0]);
+  response.status(201).json(notificationResult.rows[0]);
 });
 
 app.get("/api/admin/users", requireAuth, requireAdmin, async (request, response) => {

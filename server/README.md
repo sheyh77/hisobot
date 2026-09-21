@@ -34,3 +34,13 @@ JSON_BODY_LIMIT=2mb
 ```
 
 The API enables Helmet security headers, gzip compression, bounded JSON bodies, CORS allowlisting, global/API rate limiting, auth brute-force limiting, parameter validation, paginated admin/feed queries, and PostgreSQL connection/query timeouts.
+
+FCM production configuration requires these Render environment variables:
+
+```text
+FCM_PROJECT_ID=hisobot-app
+FCM_CLIENT_EMAIL=<Firebase service-account client email>
+FCM_PRIVATE_KEY=<Firebase service-account private key with literal \n escapes>
+```
+
+The notification sender uses high-priority Android delivery with the default sound, APNs priority 10 with default sound, and high-urgency Web Push. Invalid FCM registration tokens are removed automatically after a multicast send.

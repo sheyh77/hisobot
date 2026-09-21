@@ -2,6 +2,7 @@ import { api } from "./api";
 
 export const getUserProfile = async () => (await api.get("/api/me")).user;
 export const saveUserProfile = (_userId, values) => api.patch("/api/me", values);
+export const saveDeviceToken = (token, platform) => api.post("/api/device-tokens", { token, platform });
 export const getUserTransactions = () => api.get("/api/transactions");
 export const getAllTransactions = () => api.get("/api/admin/transactions");
 export const createTransaction = (values) => api.post("/api/transactions", values);

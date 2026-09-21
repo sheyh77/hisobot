@@ -7,8 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
-    ,"server:dev": "npm --prefix server run dev"
+    "preview": "vite preview",
+    "server:dev": "npm --prefix server run dev"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.3",
@@ -16,6 +16,7 @@
     "@capacitor/core": "^7.4.3",
     "@capacitor/ios": "^7.4.3",
     "@capacitor/local-notifications": "^7.0.7",
+    "@capacitor/push-notifications": "^7.0.0",
     "antd": "^5.27.3",
     "file-saver": "^2.0.5",
     "firebase": "^12.2.1",
