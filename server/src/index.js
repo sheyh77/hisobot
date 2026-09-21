@@ -11,7 +11,25 @@ dotenv.config();
 const app = express();
 const fcmReady = Boolean(process.env.FCM_CLIENT_EMAIL && process.env.FCM_PRIVATE_KEY && process.env.FCM_PROJECT_ID);
 if (fcmReady && !admin.apps.length) admin.initializeApp({ credential: admin.credential.cert({ projectId: process.env.FCM_PROJECT_ID, clientEmail: process.env.FCM_CLIENT_EMAIL, privateKey: process.env.FCM_PRIVATE_KEY.replace(/\\n/g, "\n") }) });
-app.use(cors({ origin: process.env.CORS_ORIGIN?.split(",") || true }));
+const allowedOrigins = (process.env.CORS_ORIGIN || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+const defaultOrigins = [
+  "https://localhost",
+  "capacitor://localhost",
+  "ionic://localhost",
+  "http://localhost",
+  "http://localhost:5173",
+];
+const corsOrigins = [...new Set([...defaultOrigins, ...allowedOrigins])];
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || corsOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error("CORS_ORIGIN_NOT_ALLOWED"));
+  },
+  credentials: true,
+}));
 app.use(express.json({ limit: "2mb" }));
 
 const userShape = (row) => ({ id: row.id, username: row.username, email: row.email, role: row.role, plan: row.plan, expiresAt: row.plan_expires_at });
