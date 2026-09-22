@@ -50,7 +50,7 @@ const defaultOrigins = [
   "ionic://localhost",
   "http://localhost",
   "http://localhost:5173",
-  "https://hisobot-umber.vercel.app/",
+  "https://hisobot-umber.vercel.app",
 ];
 const corsOrigins = [...new Set([...defaultOrigins, ...allowedOrigins])];
 const getPageParams = (request, maxLimit = 100) => {
