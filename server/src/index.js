@@ -11,6 +11,22 @@ import { pool } from "./db.js";
 import { authRateLimit, requireAdmin, requireAuth, signUser } from "./auth.js";
 
 dotenv.config();
+console.log("JWT DEBUG:", {
+  exists: Boolean(process.env.JWT_SECRET),
+  length: process.env.JWT_SECRET?.length ?? 0,
+  nodeEnv: process.env.NODE_ENV,
+});
+
+if (
+  process.env.NODE_ENV === "production" &&
+  (
+    !process.env.JWT_SECRET ||
+    process.env.JWT_SECRET.length < 32 ||
+    process.env.JWT_SECRET === "replace_with_a_long_random_secret"
+  )
+) {
+  throw new Error("JWT_SECRET must be a strong production secret of at least 32 characters");
+}
 if (process.env.NODE_ENV === "production" && (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32 || process.env.JWT_SECRET === "replace_with_a_long_random_secret")) {
   throw new Error("JWT_SECRET must be a strong production secret of at least 32 characters");
 }
@@ -34,6 +50,7 @@ const defaultOrigins = [
   "ionic://localhost",
   "http://localhost",
   "http://localhost:5173",
+  "https://hisobot-umber.vercel.app/",
 ];
 const corsOrigins = [...new Set([...defaultOrigins, ...allowedOrigins])];
 const getPageParams = (request, maxLimit = 100) => {
