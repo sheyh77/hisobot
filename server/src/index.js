@@ -40,9 +40,10 @@ const fcmReady = Boolean(
 );
 if (process.env.NODE_ENV === "production" && !fcmReady) throw new Error("FCM_CLIENT_EMAIL, FCM_PRIVATE_KEY, and FCM_PROJECT_ID are required in production");
 if (fcmReady && !admin.apps.length) admin.initializeApp({ credential: admin.credential.cert({ projectId: process.env.FCM_PROJECT_ID, clientEmail: process.env.FCM_CLIENT_EMAIL, privateKey: process.env.FCM_PRIVATE_KEY.replace(/\\n/g, "\n") }) });
+const normalizeOrigin = (origin) => origin.trim().replace(/\/+$/, "");
 const allowedOrigins = (process.env.CORS_ORIGIN || "")
   .split(",")
-  .map((origin) => origin.trim())
+  .map(normalizeOrigin)
   .filter(Boolean);
 const defaultOrigins = [
   "https://localhost",
