@@ -8,7 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "server:dev": "npm --prefix server run dev"
+    "server:dev": "npm --prefix server run dev",
+    "server:wealth": "npm --prefix server run dev:wealth"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.3",

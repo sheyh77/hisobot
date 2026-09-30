@@ -1,0 +1,2 @@
+-- Baseline marker for the pre-Prisma legacy schema.
+-- Existing legacy tables are intentionally left untouched.
